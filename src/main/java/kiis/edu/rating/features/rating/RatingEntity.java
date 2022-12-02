@@ -2,8 +2,10 @@ package kiis.edu.rating.features.rating;
 
 import kiis.edu.rating.features.common.BaseEntity;
 
+import javax.persistence.Entity;
 import javax.persistence.Table;
 
+@Entity
 @Table(name = "rating")
 public class RatingEntity extends BaseEntity {
     public long userId, subjectId;

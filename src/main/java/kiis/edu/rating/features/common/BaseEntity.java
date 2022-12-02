@@ -3,8 +3,7 @@ package kiis.edu.rating.features.common;
 import javax.persistence.*;
 import java.time.Instant;
 
-//@MappedSuperclass
-@Entity
+@MappedSuperclass
 public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
