@@ -1,13 +1,7 @@
 package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
-import kiis.edu.rating.features.common.BaseResponse;
-import kiis.edu.rating.helper.Constant;
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +20,7 @@ public class UserController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    String login(@RequestBody LoginDTO loginDTO) {
+    JwtToken login(@RequestBody LoginDTO loginDTO) {
         Optional<UserEntity> userEntity =
                 userRepository.findByEmailAndPassword(loginDTO.username, loginDTO.password);
         if (!userEntity.isPresent()) throw new IllegalArgumentException("Email or Password is incorrect");
@@ -39,11 +33,16 @@ public class UserController {
                 .signWith(ENCODED_SECRET_KEY)
                 .compact();
 
-        return BEARER + token;
+        return new JwtToken(BEARER + token);
     }
 
     @AllArgsConstructor
     private static class LoginDTO {
         public final String username, password;
+    }
+
+    @AllArgsConstructor
+    private static class JwtToken {
+        public final String token;
     }
 }
