@@ -18,9 +18,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.
                 csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(jwtTokenVerifier, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests().anyRequest().permitAll();
+                    .addFilterBefore(jwtTokenVerifier, UsernamePasswordAuthenticationFilter.class)
+                    .authorizeRequests()
+                    .anyRequest()
+                    .permitAll();
     }
 }

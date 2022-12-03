@@ -10,6 +10,9 @@ spring:
     open-in-view: true
   devtools:
     add-properties: true
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 logging:
   level:
     web: debug
