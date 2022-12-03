@@ -3,6 +3,7 @@ package kiis.edu.rating.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import kiis.edu.rating.features.user.UserRole;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static kiis.edu.rating.helper.Constant.*;
 
@@ -37,12 +37,8 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
                     .parseClaimsJws(token)
                     .getBody();
             String username = claimsJwsBody.getSubject();
-            @SuppressWarnings("unchecked")
-            Set<String> authorities = (Set<String>) claimsJwsBody.get(CLAIM_AUTHORITY);
-            Set<SimpleGrantedAuthority> simpleGrantedAuthorities =
-                    authorities.stream()
-                            .map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toSet());
+            UserRole role = (UserRole) claimsJwsBody.get(CLAIM_AUTHORITY);
+            Set<SimpleGrantedAuthority> simpleGrantedAuthorities = role.getGrantedAuthorities();
 
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(username, null, simpleGrantedAuthorities);

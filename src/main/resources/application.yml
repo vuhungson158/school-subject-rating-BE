@@ -4,7 +4,7 @@ spring:
     username: bcc30ec79fd366
     password: 5d2081cf
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
     open-in-view: true

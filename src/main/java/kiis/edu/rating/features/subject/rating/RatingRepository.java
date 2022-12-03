@@ -1,4 +1,4 @@
-package kiis.edu.rating.features.rating;
+package kiis.edu.rating.features.subject.rating;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -11,5 +11,4 @@ import java.time.Instant;
 public class TeacherEntity extends BaseEntity {
     public String name, nationality, gender;
     public Instant dob;
-
 }
