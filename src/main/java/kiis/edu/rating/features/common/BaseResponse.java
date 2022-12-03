@@ -12,7 +12,11 @@ public class BaseResponse<T> {
         this.data = data;
     }
 
-    public BaseResponse(String massage){
+    public BaseResponse(String massage) {
         this(Status.BAD_REQUEST, massage, null);
+    }
+
+    public BaseResponse(T data) {
+        this(Status.OK, "Success", data);
     }
 }
