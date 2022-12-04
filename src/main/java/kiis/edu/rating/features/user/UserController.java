@@ -58,6 +58,16 @@ public class UserController {
         return true;
     }
 
+    @PutMapping("/{id}")
+    public boolean update(@PathVariable long id, @RequestBody RegisterRequest registerRequest) {
+        if (!userRepository.findById(id).isPresent())
+            throw new IllegalArgumentException("User not exist");
+        UserEntity userEntity = registerRequest.mapToUserEntity();
+        userEntity.id = id;
+        userRepository.save(userEntity);
+        return true;
+    }
+
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable long id) {
         userRepository.deleteById(id);
