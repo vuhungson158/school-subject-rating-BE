@@ -3,6 +3,7 @@ package kiis.edu.rating.features.subject;
 import kiis.edu.rating.features.subject.rating.RatingEntity;
 import kiis.edu.rating.features.subject.rating.RatingRepository;
 import kiis.edu.rating.features.teacher.TeacherRepository;
+import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class SubjectController {
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
     private final RatingRepository ratingRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/{id}")
     public SubjectEntity getById(@PathVariable long id) {
@@ -57,13 +59,59 @@ public class SubjectController {
 
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable long id) {
+        ratingRepository.deleteBySubjectId(id);
         subjectRepository.deleteById(id);
+        return true;
+    }
+
+    @GetMapping("/rating/{id}")
+    public RatingEntity getOneRatingById(@PathVariable long id) {
+        Optional<RatingEntity> optionalRating = ratingRepository.findById(id);
+        if (!optionalRating.isPresent())
+            throw new IllegalArgumentException("No rating with id : " + id);
+        return optionalRating.get();
+    }
+
+    @GetMapping("/rating/subjectId/{id}")
+    public List<RatingEntity> getRatingsBySubjectId(@PathVariable long subjectId) {
+        return ratingRepository.findBySubjectId(subjectId);
+    }
+
+    @GetMapping("/rating/userId/{id}")
+    public List<RatingEntity> getRatingsByUserId(@PathVariable long userId) {
+        return ratingRepository.findByUserId(userId);
+    }
+
+    @PostMapping("/rating")
+    public boolean createRating(@RequestBody @Valid RatingEntity ratingEntity) {
+        if (!subjectRepository.findById(ratingEntity.subjectId).isPresent())
+            throw new IllegalArgumentException("No Subject with id : " + ratingEntity.subjectId);
+        if (!userRepository.findById(ratingEntity.userId).isPresent())
+            throw new IllegalArgumentException("No User with id : " + ratingEntity.userId);
+        Util.makeSureBaseEntityEmpty(ratingEntity.id, ratingEntity.createdAt, ratingEntity.updatedAt);
+        ratingRepository.save(ratingEntity);
+        return true;
+    }
+
+    @PutMapping("/rating/{id}")
+    public boolean updateRating(@PathVariable long id, @RequestBody @Valid RatingEntity ratingEntity) {
+        if (!subjectRepository.findById(id).isPresent())
+            throw new IllegalArgumentException("No Rating with Id: " + id);
+        Util.makeSureBaseEntityEmpty(ratingEntity.id, ratingEntity.createdAt, ratingEntity.updatedAt);
+        ratingEntity.id = id;
+        ratingRepository.save(ratingEntity);
+        return true;
+    }
+
+    @DeleteMapping("/rating/{id}")
+    public boolean deleteRating(@PathVariable long id) {
+        ratingRepository.deleteById(id);
         return true;
     }
 
     private AverageScore getAverageScore(long subjectId) {
         int practicality = 0, difficult = 0, homework = 0, testDifficult = 0, teacherPedagogical = 0;
-        List<RatingEntity> allRating = ratingRepository.findBySubjectId(subjectId);
+        List<RatingEntity> allRating = getRatingsBySubjectId(subjectId);
         for (RatingEntity rating : allRating) {
             practicality += rating.practicality;
             difficult += rating.difficult;
