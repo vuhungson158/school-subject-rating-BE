@@ -18,19 +18,18 @@ import static kiis.edu.rating.helper.Constant.PATH;
 @AllArgsConstructor
 @RequestMapping(path = PATH + "/subject")
 public class SubjectController {
+    private final String RATING_PATH = "/rating";
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
     private final RatingRepository ratingRepository;
     private final UserRepository userRepository;
 
     @GetMapping("/{id}")
-    public SubjectEntity getById(@PathVariable long id) {
+    public SubjectWithAverageScore getById(@PathVariable long id) {
         Optional<SubjectEntity> optionalSubject = subjectRepository.findById(id);
         if (!optionalSubject.isPresent())
             throw new IllegalArgumentException("No subject with id : " + id);
-        SubjectWithAverageScore subjectEntity = (SubjectWithAverageScore) optionalSubject.get();
-        subjectEntity.averageScore = getAverageScore(id);
-        return subjectEntity;
+        return new SubjectWithAverageScore(optionalSubject.get(), getAverageScore(id));
     }
 
     @GetMapping("")
@@ -64,7 +63,7 @@ public class SubjectController {
         return true;
     }
 
-    @GetMapping("/rating/{id}")
+    @GetMapping(RATING_PATH + "/{id}")
     public RatingEntity getOneRatingById(@PathVariable long id) {
         Optional<RatingEntity> optionalRating = ratingRepository.findById(id);
         if (!optionalRating.isPresent())
@@ -72,30 +71,32 @@ public class SubjectController {
         return optionalRating.get();
     }
 
-    @GetMapping("/rating/subjectId/{id}")
-    public List<RatingEntity> getRatingsBySubjectId(@PathVariable long subjectId) {
-        return ratingRepository.findBySubjectId(subjectId);
+    @GetMapping(RATING_PATH + "/subjectId/{id}")
+    public List<RatingEntity> getRatingsBySubjectId(@PathVariable("id") long subjectId) {
+        return ratingRepository.findAllBySubjectId(subjectId);
     }
 
-    @GetMapping("/rating/userId/{id}")
-    public List<RatingEntity> getRatingsByUserId(@PathVariable long userId) {
-        return ratingRepository.findByUserId(userId);
+    @GetMapping(RATING_PATH + "/userId/{id}")
+    public List<RatingEntity> getRatingsByUserId(@PathVariable("id") long userId) {
+        return ratingRepository.findAllByUserId(userId);
     }
 
-    @PostMapping("/rating")
+    @PostMapping(RATING_PATH + "")
     public boolean createRating(@RequestBody @Valid RatingEntity ratingEntity) {
         if (!subjectRepository.findById(ratingEntity.subjectId).isPresent())
             throw new IllegalArgumentException("No Subject with id : " + ratingEntity.subjectId);
         if (!userRepository.findById(ratingEntity.userId).isPresent())
             throw new IllegalArgumentException("No User with id : " + ratingEntity.userId);
+        if (ratingRepository.findBySubjectIdAndUserId(ratingEntity.subjectId, ratingEntity.userId).isPresent())
+            throw new IllegalArgumentException("This User has already rated this subject");
         Util.makeSureBaseEntityEmpty(ratingEntity.id, ratingEntity.createdAt, ratingEntity.updatedAt);
         ratingRepository.save(ratingEntity);
         return true;
     }
 
-    @PutMapping("/rating/{id}")
+    @PutMapping(RATING_PATH + "/{id}")
     public boolean updateRating(@PathVariable long id, @RequestBody @Valid RatingEntity ratingEntity) {
-        if (!subjectRepository.findById(id).isPresent())
+        if (!ratingRepository.findById(id).isPresent())
             throw new IllegalArgumentException("No Rating with Id: " + id);
         Util.makeSureBaseEntityEmpty(ratingEntity.id, ratingEntity.createdAt, ratingEntity.updatedAt);
         ratingEntity.id = id;
@@ -103,7 +104,7 @@ public class SubjectController {
         return true;
     }
 
-    @DeleteMapping("/rating/{id}")
+    @DeleteMapping(RATING_PATH + "/{id}")
     public boolean deleteRating(@PathVariable long id) {
         ratingRepository.deleteById(id);
         return true;
@@ -133,7 +134,9 @@ public class SubjectController {
         public int practicality, difficult, homework, testDifficult, teacherPedagogical;
     }
 
-    private static class SubjectWithAverageScore extends SubjectEntity {
+    @AllArgsConstructor
+    private static class SubjectWithAverageScore {
+        public SubjectEntity subject;
         public AverageScore averageScore;
     }
 }
