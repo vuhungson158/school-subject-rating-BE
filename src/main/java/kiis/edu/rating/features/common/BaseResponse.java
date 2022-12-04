@@ -1,9 +1,9 @@
 package kiis.edu.rating.features.common;
 
 public class BaseResponse<T> {
-    private final int code;
-    private final String status, massage, errorClass;
-    private final T data;
+    public final int code;
+    public final String status, massage, errorClass;
+    public final T data;
 
     public BaseResponse(Status status, String massage, String errorClass, T data) {
         this.code = status.getCode();

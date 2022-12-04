@@ -1,8 +1,12 @@
 package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
+import kiis.edu.rating.features.common.BaseResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -10,6 +14,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.Optional;
 
+import static kiis.edu.rating.features.common.Status.BAD_REQUEST;
 import static kiis.edu.rating.helper.Constant.*;
 
 @AllArgsConstructor
@@ -19,7 +24,7 @@ public class UserController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    private String login(@RequestBody LoginRequest loginRequest) {
+    public String login(@RequestBody LoginRequest loginRequest) {
         Optional<UserEntity> userEntity =
                 userRepository.findByEmailAndPassword(loginRequest.username, loginRequest.password);
         if (!userEntity.isPresent()) throw new IllegalArgumentException("Email or Password is incorrect");
@@ -35,15 +40,16 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    private UserEntity getById(@PathVariable long id) {
+    public UserEntity getById(@PathVariable long id) {
         Optional<UserEntity> optionalUser = userRepository.findById(id);
         if (!optionalUser.isPresent())
             throw new IllegalArgumentException("No user with id : " + id);
+        System.out.println(optionalUser.get());
         return optionalUser.get();
     }
 
     @PostMapping("")
-    private UserEntity registry(@RequestBody registerRequest registerRequest) {
+    public UserEntity registry(@RequestBody registerRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.email))
             throw new IllegalArgumentException("Email have already be using");
         return userRepository.save(registerRequest.mapToUserEntity());
