@@ -2,6 +2,7 @@ package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
 import kiis.edu.rating.features.common.StringWrapper;
+import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ import static kiis.edu.rating.helper.Constant.*;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(path = PATH + "/User")
+@RequestMapping(path = PATH + "/user")
 public class UserController {
     private final UserRepository userRepository;
 
@@ -51,18 +52,19 @@ public class UserController {
     }
 
     @PostMapping("")
-    public boolean createNewAcc(@RequestBody RegisterRequest registerRequest) {
-        if (userRepository.existsByEmail(registerRequest.email))
+    public boolean createNewAcc(@RequestBody UserEntity userEntity) {
+        if (userRepository.existsByEmail(userEntity.email))
             throw new IllegalArgumentException("Email have already be using");
-        userRepository.save(registerRequest.mapToUserEntity());
+        Util.makeSureBaseEntityEmpty(userEntity.id, userEntity.createdAt, userEntity.updatedAt);
+        userRepository.save(userEntity);
         return true;
     }
 
     @PutMapping("/{id}")
-    public boolean update(@PathVariable long id, @RequestBody RegisterRequest registerRequest) {
+    public boolean update(@PathVariable long id, @RequestBody UserEntity userEntity) {
         if (!userRepository.findById(id).isPresent())
-            throw new IllegalArgumentException("User not exist");
-        UserEntity userEntity = registerRequest.mapToUserEntity();
+            throw new IllegalArgumentException("No User with Id: " + id);
+        Util.makeSureBaseEntityEmpty(userEntity.id, userEntity.createdAt, userEntity.updatedAt);
         userEntity.id = id;
         userRepository.save(userEntity);
         return true;
@@ -80,18 +82,6 @@ public class UserController {
     }
 
     @AllArgsConstructor
-    private static class RegisterRequest {
-        public String email;
-        public String password, displayName, gender;
-        public Instant dob;
-        public UserRole role;
-
-        public UserEntity mapToUserEntity() {
-            return new UserEntity(email, password, displayName, gender, dob, role);
-        }
-    }
-
-    @AllArgsConstructor
     private static class SimpleUserInfo {
         public long id;
         public String displayName, gender;
@@ -104,5 +94,4 @@ public class UserController {
             this.role = userEntity.role;
         }
     }
-
 }

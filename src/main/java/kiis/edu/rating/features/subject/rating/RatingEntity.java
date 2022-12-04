@@ -9,5 +9,5 @@ import javax.persistence.Table;
 @Table(name = "subject_rating")
 public class RatingEntity extends BaseEntity {
     public long userId, subjectId;
-    public int star;
+    public int practicality, difficult, homework, testDifficult, teacherPedagogical;
 }
