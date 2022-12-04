@@ -1,6 +1,7 @@
 package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
+import kiis.edu.rating.features.common.StringWrapper;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class UserController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
+    public StringWrapper login(@RequestBody LoginRequest loginRequest) {
         Optional<UserEntity> userEntity =
                 userRepository.findByEmailAndPassword(loginRequest.username, loginRequest.password);
         if (!userEntity.isPresent()) throw new IllegalArgumentException("Email or Password is incorrect");
@@ -32,7 +33,7 @@ public class UserController {
                 .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusDays(1)))
                 .signWith(ENCODED_SECRET_KEY)
                 .compact();
-        return BEARER + token;
+        return new StringWrapper(BEARER + token);
     }
 
     @GetMapping("/{id}")
@@ -67,21 +68,25 @@ public class UserController {
     private static class LoginRequest {
         public final String username, password;
     }
+
     @AllArgsConstructor
     private static class RegisterRequest {
         public String email;
         public String password, displayName, gender;
         public Instant dob;
         public UserRole role;
+
         public UserEntity mapToUserEntity() {
             return new UserEntity(email, password, displayName, gender, dob, role);
         }
     }
+
     @AllArgsConstructor
     private static class SimpleUserInfo {
         public long id;
         public String displayName, gender;
         public UserRole role;
+
         public SimpleUserInfo(UserEntity userEntity) {
             this.id = userEntity.id;
             this.displayName = userEntity.displayName;
@@ -89,4 +94,5 @@ public class UserController {
             this.role = userEntity.role;
         }
     }
+
 }
