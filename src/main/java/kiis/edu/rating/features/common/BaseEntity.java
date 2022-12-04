@@ -12,10 +12,10 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public long id;
 
-    @CreatedDate
+//    @CreatedDate
     @Column(insertable = false, updatable = false)
     public Instant createdAt;
-    @LastModifiedDate
+//    @LastModifiedDate
     @Column(insertable = false, updatable = false)
     public Instant updatedAt;
 

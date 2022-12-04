@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.time.Instant;
 
@@ -21,5 +19,6 @@ public class UserEntity extends BaseEntity {
     public String email;
     public String password, displayName, gender;
     public Instant dob;
+    @Enumerated(EnumType.STRING)
     public UserRole role;
 }

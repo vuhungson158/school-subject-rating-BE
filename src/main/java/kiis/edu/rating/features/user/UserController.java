@@ -1,20 +1,16 @@
 package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
-import kiis.edu.rating.features.common.BaseResponse;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static kiis.edu.rating.features.common.Status.BAD_REQUEST;
 import static kiis.edu.rating.helper.Constant.*;
 
 @AllArgsConstructor
@@ -44,39 +40,53 @@ public class UserController {
         Optional<UserEntity> optionalUser = userRepository.findById(id);
         if (!optionalUser.isPresent())
             throw new IllegalArgumentException("No user with id : " + id);
-        System.out.println(optionalUser.get());
         return optionalUser.get();
     }
 
+    @GetMapping("")
+    public List<SimpleUserInfo> getSimpleList() {
+        List<UserEntity> all = userRepository.findAll();
+        return all.stream().map(SimpleUserInfo::new).collect(Collectors.toList());
+    }
+
     @PostMapping("")
-    public UserEntity registry(@RequestBody registerRequest registerRequest) {
+    public boolean createNewAcc(@RequestBody RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.email))
             throw new IllegalArgumentException("Email have already be using");
-        return userRepository.save(registerRequest.mapToUserEntity());
+        userRepository.save(registerRequest.mapToUserEntity());
+        return true;
     }
-//    {
-//        "displayName": "Admin",
-//        "dob": "2022-12-03T11:59:39.818Z",
-//        "email": "Admin@gmail.com",
-//        "gender": "male",
-//        "password": "AdminPassword",
-//        "role": "ADMIN"
-//    }
+
+    @DeleteMapping("/{id}")
+    public boolean delete(@PathVariable long id) {
+        userRepository.deleteById(id);
+        return true;
+    }
 
     @AllArgsConstructor
     private static class LoginRequest {
         public final String username, password;
     }
-
     @AllArgsConstructor
-    private static class registerRequest {
+    private static class RegisterRequest {
         public String email;
         public String password, displayName, gender;
         public Instant dob;
         public UserRole role;
-
         public UserEntity mapToUserEntity() {
             return new UserEntity(email, password, displayName, gender, dob, role);
+        }
+    }
+    @AllArgsConstructor
+    private static class SimpleUserInfo {
+        public long id;
+        public String displayName, gender;
+        public UserRole role;
+        public SimpleUserInfo(UserEntity userEntity) {
+            this.id = userEntity.id;
+            this.displayName = userEntity.displayName;
+            this.gender = userEntity.gender;
+            this.role = userEntity.role;
         }
     }
 }

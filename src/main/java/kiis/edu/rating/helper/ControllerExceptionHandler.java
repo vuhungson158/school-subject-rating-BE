@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import static kiis.edu.rating.features.common.Status.BAD_REQUEST;
+import static kiis.edu.rating.features.common.Status.SERVER_ERROR;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public BaseResponse<Object> exceptionHandle(Exception exception) {
-        return new BaseResponse<>(BAD_REQUEST, exception.getMessage(), exception.getClass().getName());
+        if (exception instanceof IllegalArgumentException)
+            return new BaseResponse<>(BAD_REQUEST, exception.getMessage(), exception.getClass().getName());
+        return new BaseResponse<>(SERVER_ERROR, exception.getMessage(), exception.getClass().getName());
     }
 }
