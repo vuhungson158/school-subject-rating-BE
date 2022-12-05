@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import static kiis.edu.rating.helper.Constant.PATH;
 
+@SuppressWarnings("unused")
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = PATH + "/subject")
@@ -76,6 +77,8 @@ public class SubjectController {
 
     @GetMapping(RATING_PATH + "/subjectId/{id}")
     public List<SubjectRatingEntity> getRatingsBySubjectId(@PathVariable("id") long subjectId) {
+        if (!subjectRepository.findById(subjectId).isPresent())
+            throw new IllegalArgumentException("No subject with id : " + subjectId);
         return subjectRatingRepository.findAllBySubjectId(subjectId);
     }
 

@@ -9,7 +9,6 @@ import javax.persistence.Table;
 @Table(name = "comment")
 public class CommentEntity extends BaseEntity {
     public long userId, refId;
-    public long refTable;
-    public String comment;
-    public boolean enable;
+    public String refTable, comment;
+    public boolean disable;
 }

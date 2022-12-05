@@ -1,6 +1,5 @@
 package kiis.edu.rating.features.teacher;
 
-import kiis.edu.rating.features.subject.SubjectEntity;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingEntity;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingRepository;
 import kiis.edu.rating.features.user.UserRepository;
@@ -13,6 +12,7 @@ import java.util.Optional;
 
 import static kiis.edu.rating.helper.Constant.PATH;
 
+@SuppressWarnings("unused")
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = PATH + "/teacher")

@@ -2,11 +2,9 @@ package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
 import kiis.edu.rating.features.common.StringWrapper;
-import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +13,7 @@ import java.util.stream.Collectors;
 
 import static kiis.edu.rating.helper.Constant.*;
 
+@SuppressWarnings("unused")
 @AllArgsConstructor
 @RestController
 @RequestMapping(path = PATH + "/user")
