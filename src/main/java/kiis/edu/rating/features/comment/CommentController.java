@@ -4,10 +4,12 @@ import kiis.edu.rating.features.comment.rating.CommentRatingEntity;
 import kiis.edu.rating.features.comment.rating.CommentRatingRepository;
 import kiis.edu.rating.features.subject.SubjectRepository;
 import kiis.edu.rating.features.teacher.TeacherRepository;
+import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,6 +26,7 @@ public class CommentController {
     private final CommentRatingRepository commentRatingRepository;
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/{id}")
     public CommentWithReactCount getById(@PathVariable long id) {
@@ -33,14 +36,17 @@ public class CommentController {
         return new CommentWithReactCount(optionalComment.get(), countReact(id));
     }
 
-//    @GetMapping("/top-rating/{id}")
-//    public CommentWithReactCount getTopRatingById(@PathVariable long id) {
-//        Optional<CommentEntity> optionalComment = commentRepository.findById(id);
-//        commentRepository.findAll(Pageable);
-//        if (!optionalComment.isPresent())
-//            throw new IllegalArgumentException("No comment with id : " + id);
-//        return new CommentWithReactCount(optionalComment.get(), countReact(id));
-//    }
+    @PostMapping("/top-comment/")
+    public List<CommentWithReactCount> getTopRatingById(@RequestBody TopCommentRequest request) {
+        List<CommentWithReactCount> result = new ArrayList<>();
+        List<CommentEntity> commentEntityList = commentRepository
+                .findTopRatingComment(request.limit, request.page, request.refTable, request.refId);
+        for (CommentEntity commentEntity : commentEntityList) {
+            ReactCount reactCount = countReact(commentEntity.id);
+            result.add(new CommentWithReactCount(commentEntity, reactCount));
+        }
+        return result;
+    }
 
     @GetMapping("")
     public List<CommentEntity> getAll() {
@@ -50,8 +56,10 @@ public class CommentController {
     @PostMapping("")
     public boolean create(@RequestBody @Valid CommentEntity commentEntity) {
         commentEntity.makeSureBaseEntityEmpty();
+        if (!userRepository.findById(commentEntity.userId).isPresent())
+            throw new IllegalArgumentException("No User with id : " + commentEntity.userId);
         if (Objects.equals(commentEntity.refTable, "subject")
-                && subjectRepository.findById(commentEntity.refId).isPresent())
+                && !subjectRepository.findById(commentEntity.refId).isPresent())
             throw new IllegalArgumentException("No subject with id : " + commentEntity.refId);
         if (Objects.equals(commentEntity.refTable, "teacher")
                 && !teacherRepository.findById(commentEntity.refId).isPresent())
@@ -88,7 +96,7 @@ public class CommentController {
     }
 
     @GetMapping(RATING_PATH + "/commentId/{id}")
-    public List<CommentRatingEntity> getRatingsByCommentId(@PathVariable long commentId) {
+    public List<CommentRatingEntity> getRatingsByCommentId(@PathVariable("id") long commentId) {
         checkCommentExist(commentId);
         return commentRatingRepository.findByCommentId(commentId);
     }
@@ -96,6 +104,8 @@ public class CommentController {
     @PostMapping(RATING_PATH + "")
     public boolean createRating(@RequestBody CommentRatingEntity commentRatingEntity) {
         commentRatingEntity.makeSureBaseEntityEmpty();
+        checkCommentExist(commentRatingEntity.commentId);
+        checkUserExist(commentRatingEntity.userId);
         if (commentRatingRepository.findByUserIdAndCommentId(commentRatingEntity.userId, commentRatingEntity.commentId).isPresent())
             throw new IllegalArgumentException("This User has already react this comment ");
         commentRatingRepository.save(commentRatingEntity);
@@ -129,9 +139,21 @@ public class CommentController {
         public final long like, dislike;
     }
 
+    @AllArgsConstructor
+    private static class TopCommentRequest {
+        public final int limit, page;
+        public final String refTable;
+        public final long refId;
+    }
+
     private void checkCommentExist(long commentId) {
         if (!commentRepository.findById(commentId).isPresent())
             throw new IllegalArgumentException("No comment with id : " + commentId);
+    }
+
+    private void checkUserExist(long userId) {
+        if (!userRepository.findById(userId).isPresent())
+            throw new IllegalArgumentException("No User with id : " + userId);
     }
 
     private ReactCount countReact(long commentId) {

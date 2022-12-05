@@ -11,4 +11,8 @@ public class CommentEntity extends BaseEntity {
     public long userId, refId;
     public String refTable, comment;
     public boolean disable;
+//    @Column(insertable = false, updatable = false)
+//    public int likeCount;
+//    @Column(insertable = false, updatable = false)
+//    public int dislikeCount;
 }
