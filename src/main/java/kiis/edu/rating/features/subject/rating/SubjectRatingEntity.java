@@ -9,7 +9,7 @@ import javax.validation.constraints.Min;
 
 @Entity
 @Table(name = "subject_rating")
-public class RatingEntity extends BaseEntity {
+public class SubjectRatingEntity extends BaseEntity {
     public long userId, subjectId;
     @Min(value = 0, message = "Min = 0")
     @Max(value = 100, message = "Max = 100")

@@ -23,4 +23,5 @@ public class SubjectEntity extends BaseEntity {
     @Max(value = 4, message = "Max = 4")
     public int formYear;
     public String name, specialize;
+    public boolean disable;
 }

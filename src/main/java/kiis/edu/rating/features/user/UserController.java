@@ -55,7 +55,7 @@ public class UserController {
     public boolean createNewAcc(@RequestBody UserEntity userEntity) {
         if (userRepository.existsByEmail(userEntity.email))
             throw new IllegalArgumentException("Email have already be using");
-        Util.makeSureBaseEntityEmpty(userEntity.id, userEntity.createdAt, userEntity.updatedAt);
+        userEntity.makeSureBaseEntityEmpty();
         userRepository.save(userEntity);
         return true;
     }
@@ -64,7 +64,7 @@ public class UserController {
     public boolean update(@PathVariable long id, @RequestBody UserEntity userEntity) {
         if (!userRepository.findById(id).isPresent())
             throw new IllegalArgumentException("No User with Id: " + id);
-        Util.makeSureBaseEntityEmpty(userEntity.id, userEntity.createdAt, userEntity.updatedAt);
+        userEntity.makeSureBaseEntityEmpty();
         userEntity.id = id;
         userRepository.save(userEntity);
         return true;

@@ -21,4 +21,5 @@ public class UserEntity extends BaseEntity {
     public Instant dob;
     @Enumerated(EnumType.STRING)
     public UserRole role;
+    public boolean disable;
 }
