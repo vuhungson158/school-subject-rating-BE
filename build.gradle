@@ -60,3 +60,4 @@ tasks.named('test') {
 //        project.file('app.jar').delete()
 //    }
 //}
+//web: java $JAVA_OPTS -Dserver.port=$PORT -jar app.jar
