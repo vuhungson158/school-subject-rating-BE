@@ -1,8 +1,8 @@
 plugins {
-	id 'java'
-	id 'war'
-	id 'org.springframework.boot' version '2.7.6'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+    id 'war'
+    id 'org.springframework.boot' version '2.7.6'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
 group = 'kiis.edu'
@@ -10,51 +10,53 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	def verJwt = '0.11.5'
+    def verJwt = '0.11.5'
 //	Spring core
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 //	Test
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 //	Security
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation "io.jsonwebtoken:jjwt-api:$verJwt"
-	implementation "io.jsonwebtoken:jjwt-impl:$verJwt"
-	implementation "io.jsonwebtoken:jjwt-jackson:$verJwt"
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation "io.jsonwebtoken:jjwt-api:$verJwt"
+    implementation "io.jsonwebtoken:jjwt-impl:$verJwt"
+    implementation "io.jsonwebtoken:jjwt-jackson:$verJwt"
 //	Database
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 //	Helper
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'io.springfox:springfox-boot-starter:3.0.0' // Swagger
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'io.springfox:springfox-boot-starter:3.0.0' // Swagger
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 task stage(type: Copy, dependsOn: [clean, build]) {
-	from jar.archivePath
-	into project.rootDir
-	rename {
-		'app.jar'
-	}
+    from jar.archivePath
+    into project.rootDir
+    rename {
+        'app.jar'
+    }
 }
 stage.mustRunAfter(clean)
 
-clean << {
-	project.file('app.jar').delete()
+clean {
+    doLast {
+        project.file('app.jar').delete()
+    }
 }
