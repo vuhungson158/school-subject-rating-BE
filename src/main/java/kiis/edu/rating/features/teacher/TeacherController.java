@@ -1,12 +1,16 @@
 package kiis.edu.rating.features.teacher;
 
+import kiis.edu.rating.features.common.enums.Gender;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingEntity;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,17 +41,16 @@ public class TeacherController {
     }
 
     @PostMapping("")
-    public boolean create(@RequestBody TeacherEntity teacherEntity) {
-        teacherEntity.makeSureBaseEntityEmpty();
-        teacherRepository.save(teacherEntity);
+    public boolean create(@RequestBody TeacherRequest request) {
+        teacherRepository.save(request.toEntity());
         return true;
     }
 
     @PutMapping("/{id}")
-    public boolean update(@PathVariable long id, @RequestBody TeacherEntity teacherEntity) {
-        if (!teacherRepository.findById(id).isPresent())
-            throw new IllegalArgumentException("Teacher not exist");
-        teacherEntity.makeSureBaseEntityEmpty();
+    public boolean update(@PathVariable long id, @RequestBody TeacherRequest request) {
+        if (!teacherRepository.existsById(id))
+            throw new IllegalArgumentException("No Teacher with ID:" + id);
+        TeacherEntity teacherEntity = request.toEntity();
         teacherEntity.id = id;
         teacherRepository.save(teacherEntity);
         return true;
@@ -137,6 +140,17 @@ public class TeacherController {
     @AllArgsConstructor
     private static class AverageScore {
         public int enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel, size;
+    }
+
+    @AllArgsConstructor
+    private static class TeacherRequest {
+        public String name, nationality;
+        public Gender gender;
+        public Instant dob;
+
+        public TeacherEntity toEntity() {
+            return new TeacherEntity(name, nationality, gender, dob, false);
+        }
     }
 
     @AllArgsConstructor

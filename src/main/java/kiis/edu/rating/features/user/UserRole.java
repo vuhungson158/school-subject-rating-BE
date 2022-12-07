@@ -20,17 +20,11 @@ public enum UserRole {
             FILE_GET, FILE_INSERT, FILE_UPDATE, FILE_DELETE,
             OTHER_GET
     ),
-    TEACHER(
+    USER(
             SUBJECT_GET,
             TEACHER_GET,
             RATING_GET,
             FILE_GET
-    ),
-    STUDENT(
-            SUBJECT_GET, SUBJECT_UPDATE,
-            TEACHER_GET,
-            RATING_GET, RATING_INSERT, RATING_UPDATE, RATING_DELETE,
-            FILE_GET, FILE_INSERT, FILE_DELETE
     );
 
     private final Set<UserAuthority> authorities;

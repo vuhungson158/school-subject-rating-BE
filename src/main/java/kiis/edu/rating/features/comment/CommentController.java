@@ -56,16 +56,20 @@ public class CommentController {
     @PostMapping("")
     public boolean create(@RequestBody @Valid CommentEntity commentEntity) {
         commentEntity.makeSureBaseEntityEmpty();
-        if (!userRepository.findById(commentEntity.userId).isPresent())
-            throw new IllegalArgumentException("No User with id : " + commentEntity.userId);
-        if (Objects.equals(commentEntity.refTable, "subject")
-                && !subjectRepository.findById(commentEntity.refId).isPresent())
-            throw new IllegalArgumentException("No subject with id : " + commentEntity.refId);
-        if (Objects.equals(commentEntity.refTable, "teacher")
-                && !teacherRepository.findById(commentEntity.refId).isPresent())
-            throw new IllegalArgumentException("No teacher with id : " + commentEntity.refId);
-        if (commentRepository.findByRefTableAndRefIdAndUserId(commentEntity.refTable, commentEntity.refId, commentEntity.userId).isPresent())
-            throw new IllegalArgumentException("This User has already commented this " + commentEntity.refTable);
+        String refTable = commentEntity.refTable.name();
+        long userId = commentEntity.userId;
+        long refId = commentEntity.refId;
+
+        if (!userRepository.findById(userId).isPresent())
+            throw new IllegalArgumentException("No User with id : " + userId);
+        if (Objects.equals(refTable, "subject")
+                && !subjectRepository.findById(refId).isPresent())
+            throw new IllegalArgumentException("No subject with id : " + refId);
+        if (Objects.equals(refTable, "teacher")
+                && !teacherRepository.findById(refId).isPresent())
+            throw new IllegalArgumentException("No teacher with id : " + refId);
+        if (commentRepository.findByRefTableAndRefIdAndUserId(refTable, refId, userId).isPresent())
+            throw new IllegalArgumentException("This User has already commented this " + refTable);
         commentRepository.save(commentEntity);
         return true;
     }

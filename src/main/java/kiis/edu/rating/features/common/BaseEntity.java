@@ -18,10 +18,4 @@ public class BaseEntity {
     @LastModifiedDate
     @Column(insertable = false, updatable = false)
     public Instant updatedAt;
-
-    public void makeSureBaseEntityEmpty() {
-        if (this.id != 0 || this.createdAt != null || this.updatedAt != null)
-            throw new IllegalArgumentException("Make sure id, createAt, updateAt is empty");
-    }
-
 }

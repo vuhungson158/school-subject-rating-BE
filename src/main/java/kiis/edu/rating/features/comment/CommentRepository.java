@@ -16,7 +16,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     Optional<CommentEntity> findByRefTableAndRefIdAndUserId(String refTable, long refId, long userId);
 
     @Query(nativeQuery = true, value =
-            "select * from "
+            "select comment.*, count(if(react=1,1,null)) as likeCount, count(if(react=0,1,null)) as dislikeCount from "
                     + "( "
                     + "select * from comment "
                     + "where ref_table = :refTable and ref_id = :refId "

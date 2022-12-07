@@ -1,6 +1,7 @@
 package kiis.edu.rating.features.user;
 
 import kiis.edu.rating.features.common.BaseEntity;
+import kiis.edu.rating.features.common.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
@@ -17,7 +18,9 @@ import java.time.Instant;
 public class UserEntity extends BaseEntity {
     @Column(unique = true)
     public String email;
-    public String password, displayName, gender;
+    public String password, displayName;
+    @Enumerated(EnumType.STRING)
+    public Gender gender;
     public Instant dob;
     @Enumerated(EnumType.STRING)
     public UserRole role;

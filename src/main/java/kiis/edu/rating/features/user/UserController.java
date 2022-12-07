@@ -2,9 +2,14 @@ package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
 import kiis.edu.rating.features.common.StringWrapper;
+import kiis.edu.rating.features.common.enums.Gender;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -51,19 +56,18 @@ public class UserController {
     }
 
     @PostMapping("")
-    public boolean createNewAcc(@RequestBody UserEntity userEntity) {
-        if (userRepository.existsByEmail(userEntity.email))
+    public boolean createNewAcc(@RequestBody UserRequest request) {
+        if (userRepository.existsByEmail(request.email))
             throw new IllegalArgumentException("Email have already be using");
-        userEntity.makeSureBaseEntityEmpty();
-        userRepository.save(userEntity);
+        userRepository.save(request.toEntity());
         return true;
     }
 
     @PutMapping("/{id}")
-    public boolean update(@PathVariable long id, @RequestBody UserEntity userEntity) {
-        if (!userRepository.findById(id).isPresent())
+    public boolean update(@PathVariable long id, @RequestBody UserRequest request) {
+        if (!userRepository.existsById(id))
             throw new IllegalArgumentException("No User with Id: " + id);
-        userEntity.makeSureBaseEntityEmpty();
+        UserEntity userEntity = request.toEntity();
         userEntity.id = id;
         userRepository.save(userEntity);
         return true;
@@ -71,7 +75,12 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public boolean delete(@PathVariable long id) {
-        userRepository.deleteById(id);
+        Optional<UserEntity> optionalUser = userRepository.findById(id);
+        if (!optionalUser.isPresent())
+            throw new IllegalArgumentException("No User with Id: " + id);
+        UserEntity userEntity = optionalUser.get();
+        userEntity.disable = true;
+        userRepository.save(userEntity);
         return true;
     }
 
@@ -81,9 +90,23 @@ public class UserController {
     }
 
     @AllArgsConstructor
+    private static class UserRequest {
+        public String email;
+        public String password, displayName;
+        public Gender gender;
+        public Instant dob;
+        public UserRole role;
+
+        public UserEntity toEntity() {
+            return new UserEntity(email, password, displayName, gender, dob, role, false);
+        }
+    }
+
+    @AllArgsConstructor
     private static class SimpleUserInfo {
         public long id;
-        public String displayName, gender;
+        public String displayName;
+        public Gender gender;
         public UserRole role;
 
         public SimpleUserInfo(UserEntity userEntity) {
