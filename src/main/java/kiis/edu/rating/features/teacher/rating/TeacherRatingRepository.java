@@ -10,6 +10,5 @@ import java.util.Optional;
 public interface TeacherRatingRepository extends JpaRepository<TeacherRatingEntity, Long> {
     List<TeacherRatingEntity> findAllByTeacherId(long teacherId);
     List<TeacherRatingEntity> findAllByUserId(long userId);
-    void deleteByTeacherId(long teacherId);
-    Optional<TeacherRatingEntity> findByTeacherIdAndUserId(long teacherId, long userId);
+    Optional<TeacherRatingEntity> existsByTeacherIdAndUserId(long teacherId, long userId);
 }

@@ -1,5 +1,7 @@
 package kiis.edu.rating.features.subject;
 
+import kiis.edu.rating.features.common.RequestDTO;
+import kiis.edu.rating.features.common.enums.Specialize;
 import kiis.edu.rating.features.subject.rating.SubjectRatingEntity;
 import kiis.edu.rating.features.subject.rating.SubjectRatingRepository;
 import kiis.edu.rating.features.teacher.TeacherRepository;
@@ -8,6 +10,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,32 +43,28 @@ public class SubjectController {
     }
 
     @PostMapping("")
-    public boolean create(@RequestBody @Valid SubjectEntity subjectEntity) {
-        if (!teacherRepository.findById(subjectEntity.teacherId).isPresent())
-            throw new IllegalArgumentException("No teacher with id : " + subjectEntity.teacherId);
-        subjectEntity.makeSureBaseEntityEmpty();
-        subjectRepository.save(subjectEntity);
-        return true;
+    public void create(@RequestBody @Valid SubjectRequest request) {
+        if (!teacherRepository.existsById(request.teacherId))
+            throw new IllegalArgumentException("No teacher with id : " + request.teacherId);
+        subjectRepository.save(request.toEntity());
     }
 
     @PutMapping("/{id}")
-    public boolean update(@PathVariable long id, @RequestBody @Valid SubjectEntity subjectEntity) {
-        if (!subjectRepository.findById(id).isPresent())
+    public void update(@PathVariable long id, @RequestBody @Valid SubjectRequest request) {
+        if (!subjectRepository.existsById(id))
             throw new IllegalArgumentException("No Subject with Id: " + id);
-        subjectEntity.makeSureBaseEntityEmpty();
+        SubjectEntity subjectEntity = request.toEntity();
         subjectEntity.id = id;
         subjectRepository.save(subjectEntity);
-        return true;
     }
 
     @DeleteMapping("/{id}")
-    public boolean delete(@PathVariable long id) {
+    public void delete(@PathVariable long id) {
         Optional<SubjectEntity> optionalSubject = subjectRepository.findById(id);
         if (!optionalSubject.isPresent()) throw new IllegalArgumentException("No Subject with Id: " + id);
         SubjectEntity subjectEntity = optionalSubject.get();
         subjectEntity.disable = true;
         subjectRepository.save(subjectEntity);
-        return true;
     }
 
     @GetMapping(RATING_PATH + "/{id}")
@@ -77,7 +77,7 @@ public class SubjectController {
 
     @GetMapping(RATING_PATH + "/subjectId/{id}")
     public List<SubjectRatingEntity> getRatingsBySubjectId(@PathVariable("id") long subjectId) {
-        if (!subjectRepository.findById(subjectId).isPresent())
+        if (!subjectRepository.existsById(subjectId))
             throw new IllegalArgumentException("No subject with id : " + subjectId);
         return subjectRatingRepository.findAllBySubjectId(subjectId);
     }
@@ -94,32 +94,30 @@ public class SubjectController {
     }
 
     @PostMapping(RATING_PATH + "")
-    public boolean createRating(@RequestBody @Valid SubjectRatingEntity subjectRatingEntity) {
-        if (!subjectRepository.findById(subjectRatingEntity.subjectId).isPresent())
-            throw new IllegalArgumentException("No Subject with id : " + subjectRatingEntity.subjectId);
-        if (!userRepository.findById(subjectRatingEntity.userId).isPresent())
-            throw new IllegalArgumentException("No User with id : " + subjectRatingEntity.userId);
-        if (subjectRatingRepository.findBySubjectIdAndUserId(subjectRatingEntity.subjectId, subjectRatingEntity.userId).isPresent())
+    public void createRating(@RequestBody @Valid RatingRequest request) {
+        long subjectId = request.subjectId;
+        long userId = request.userId;
+        if (!subjectRepository.existsById(subjectId))
+            throw new IllegalArgumentException("No Subject with id : " + subjectId);
+        if (!userRepository.existsById(userId))
+            throw new IllegalArgumentException("No User with id : " + userId);
+        if (subjectRatingRepository.findBySubjectIdAndUserId(subjectId, userId).isPresent())
             throw new IllegalArgumentException("This User has already rated this subject");
-        subjectRatingEntity.makeSureBaseEntityEmpty();
-        subjectRatingRepository.save(subjectRatingEntity);
-        return true;
+        subjectRatingRepository.save(request.toEntity());
     }
 
     @PutMapping(RATING_PATH + "/{id}")
-    public boolean updateRating(@PathVariable long id, @RequestBody @Valid SubjectRatingEntity subjectRatingEntity) {
-        if (!subjectRatingRepository.findById(id).isPresent())
+    public void updateRating(@PathVariable long id, @RequestBody @Valid RatingRequest request) {
+        if (!subjectRatingRepository.existsById(id))
             throw new IllegalArgumentException("No Rating with Id: " + id);
-        subjectRatingEntity.makeSureBaseEntityEmpty();
+        SubjectRatingEntity subjectRatingEntity = request.toEntity();
         subjectRatingEntity.id = id;
         subjectRatingRepository.save(subjectRatingEntity);
-        return true;
     }
 
     @DeleteMapping(RATING_PATH + "/{id}")
-    public boolean deleteRating(@PathVariable long id) {
+    public void deleteRating(@PathVariable long id) {
         subjectRatingRepository.deleteById(id);
-        return true;
     }
 
     private AverageScore getAverageScore(List<SubjectRatingEntity> allRating) {
@@ -132,22 +130,64 @@ public class SubjectController {
             teacherPedagogical += rating.teacherPedagogical;
         }
         int listSize = allRating.size();
-        practicality = Math.floorDiv(practicality, listSize);
-        difficult = Math.floorDiv(difficult, listSize);
-        homework = Math.floorDiv(homework, listSize);
-        testDifficult = Math.floorDiv(testDifficult, listSize);
-        teacherPedagogical = Math.floorDiv(teacherPedagogical, listSize);
+        practicality = practicality / listSize;
+        difficult = difficult / listSize;
+        homework = homework / listSize;
+        testDifficult = testDifficult / listSize;
+        teacherPedagogical = teacherPedagogical / listSize;
         return new AverageScore(practicality, difficult, homework, testDifficult, teacherPedagogical, listSize);
     }
 
     @AllArgsConstructor
     private static class AverageScore {
-        public int practicality, difficult, homework, testDifficult, teacherPedagogical, size;
+        public double practicality, difficult, homework, testDifficult, teacherPedagogical, size;
     }
 
     @AllArgsConstructor
     private static class SubjectWithAverageScore {
         public SubjectEntity subject;
         public AverageScore averageScore;
+    }
+
+    @AllArgsConstructor
+    private static class SubjectRequest implements RequestDTO {
+        public long teacherId;
+        @Min(value = 1, message = "Min = 1")
+        @Max(value = 6, message = "Max = 6")
+        public int unit;
+        @Min(value = 1, message = "Min = 1")
+        @Max(value = 4, message = "Max = 4")
+        public int formYear;
+        public String name;
+        public Specialize specialize;
+        public boolean disable;
+
+        public SubjectEntity toEntity() {
+            return new SubjectEntity(teacherId, unit, formYear, name, specialize, disable);
+        }
+    }
+
+    @AllArgsConstructor
+    private static class RatingRequest implements RequestDTO {
+        public long userId, subjectId;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int practicality;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int difficult;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int homework;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int testDifficult;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int teacherPedagogical;
+
+        public SubjectRatingEntity toEntity() {
+            return new SubjectRatingEntity(userId, subjectId, practicality, difficult, homework, testDifficult, teacherPedagogical);
+        }
     }
 }

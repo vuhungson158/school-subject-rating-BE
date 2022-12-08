@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface CommentRatingRepository extends JpaRepository<CommentRatingEntity, Long> {
-    long countByCommentIdAndReact(long commentId, boolean react);
+    int countByCommentIdAndReact(long commentId, boolean react);
 
     List<CommentRatingEntity> findByCommentId(long commentId);
 

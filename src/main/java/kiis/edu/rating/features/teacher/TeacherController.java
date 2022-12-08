@@ -1,5 +1,6 @@
 package kiis.edu.rating.features.teacher;
 
+import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.common.enums.Gender;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingEntity;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingRepository;
@@ -7,9 +8,9 @@ import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -41,29 +42,26 @@ public class TeacherController {
     }
 
     @PostMapping("")
-    public boolean create(@RequestBody TeacherRequest request) {
+    public void create(@RequestBody TeacherRequest request) {
         teacherRepository.save(request.toEntity());
-        return true;
     }
 
     @PutMapping("/{id}")
-    public boolean update(@PathVariable long id, @RequestBody TeacherRequest request) {
+    public void update(@PathVariable long id, @RequestBody TeacherRequest request) {
         if (!teacherRepository.existsById(id))
             throw new IllegalArgumentException("No Teacher with ID:" + id);
         TeacherEntity teacherEntity = request.toEntity();
         teacherEntity.id = id;
         teacherRepository.save(teacherEntity);
-        return true;
     }
 
     @DeleteMapping("/{id}")
-    public boolean delete(@PathVariable long id) {
+    public void delete(@PathVariable long id) {
         Optional<TeacherEntity> optionalTeacher = teacherRepository.findById(id);
         if (!optionalTeacher.isPresent()) throw new IllegalArgumentException("No Teacher with Id: " + id);
         TeacherEntity teacherEntity = optionalTeacher.get();
         teacherEntity.disable = true;
         teacherRepository.save(teacherEntity);
-        return true;
     }
 
     @GetMapping(RATING_PATH + "/{id}")
@@ -91,32 +89,30 @@ public class TeacherController {
     }
 
     @PostMapping(RATING_PATH + "")
-    public boolean createRating(@RequestBody @Valid TeacherRatingEntity teacherRatingEntity) {
-        if (!teacherRepository.findById(teacherRatingEntity.teacherId).isPresent())
-            throw new IllegalArgumentException("No Teacher with id : " + teacherRatingEntity.teacherId);
-        if (!userRepository.findById(teacherRatingEntity.userId).isPresent())
-            throw new IllegalArgumentException("No User with id : " + teacherRatingEntity.userId);
-        if (teacherRatingRepository.findByTeacherIdAndUserId(teacherRatingEntity.teacherId, teacherRatingEntity.userId).isPresent())
+    public void createRating(@RequestBody @Valid RatingRequest request) {
+        long teacherId = request.teacherId;
+        long userId = request.userId;
+        if (!teacherRepository.existsById(teacherId))
+            throw new IllegalArgumentException("No Teacher with id : " + teacherId);
+        if (!userRepository.existsById(userId))
+            throw new IllegalArgumentException("No User with id : " + userId);
+        if (teacherRatingRepository.existsByTeacherIdAndUserId(teacherId, userId).isPresent())
             throw new IllegalArgumentException("This User has already rated this Teacher");
-        teacherRatingEntity.makeSureBaseEntityEmpty();
-        teacherRatingRepository.save(teacherRatingEntity);
-        return true;
+        teacherRatingRepository.save(request.toEntity());
     }
 
     @PutMapping(RATING_PATH + "/{id}")
-    public boolean updateRating(@PathVariable long id, @RequestBody @Valid TeacherRatingEntity teacherRatingEntity) {
-        if (!teacherRatingRepository.findById(id).isPresent())
+    public void updateRating(@PathVariable long id, @RequestBody @Valid RatingRequest request) {
+        if (!teacherRatingRepository.existsById(id))
             throw new IllegalArgumentException("No Rating with Id: " + id);
-        teacherRatingEntity.makeSureBaseEntityEmpty();
-        teacherRatingEntity.id = id;
-        teacherRatingRepository.save(teacherRatingEntity);
-        return true;
+        TeacherRatingEntity ratingEntity = request.toEntity();
+        ratingEntity.id = id;
+        teacherRatingRepository.save(ratingEntity);
     }
 
     @DeleteMapping(RATING_PATH + "/{id}")
-    public boolean deleteRating(@PathVariable long id) {
+    public void deleteRating(@PathVariable long id) {
         teacherRatingRepository.deleteById(id);
-        return true;
     }
 
     private AverageScore getAverageScore(List<TeacherRatingEntity> allRating) {
@@ -129,27 +125,52 @@ public class TeacherController {
             pedagogicalLevel += rating.pedagogicalLevel;
         }
         int listSize = allRating.size();
-        enthusiasm = Math.floorDiv(enthusiasm, listSize);
-        friendly = Math.floorDiv(friendly, listSize);
-        nonConservatism = Math.floorDiv(nonConservatism, listSize);
-        erudition = Math.floorDiv(erudition, listSize);
-        pedagogicalLevel = Math.floorDiv(pedagogicalLevel, listSize);
+        enthusiasm = enthusiasm / listSize;
+        friendly = friendly / listSize;
+        nonConservatism = nonConservatism / listSize;
+        erudition = erudition / listSize;
+        pedagogicalLevel = pedagogicalLevel / listSize;
         return new AverageScore(enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel, listSize);
     }
 
     @AllArgsConstructor
     private static class AverageScore {
-        public int enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel, size;
+        public double enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel, size;
     }
 
     @AllArgsConstructor
-    private static class TeacherRequest {
+    private static class TeacherRequest implements RequestDTO {
         public String name, nationality;
         public Gender gender;
         public Instant dob;
 
+        @Override
         public TeacherEntity toEntity() {
             return new TeacherEntity(name, nationality, gender, dob, false);
+        }
+    }
+
+    @AllArgsConstructor
+    private static class RatingRequest implements RequestDTO {
+        public long userId, teacherId;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int enthusiasm;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int friendly;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int nonConservatism;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int erudition;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 100, message = "Max = 100")
+        public int pedagogicalLevel;
+
+        public TeacherRatingEntity toEntity() {
+            return new TeacherRatingEntity(userId, teacherId, enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel);
         }
     }
 
