@@ -1,6 +1,8 @@
 package kiis.edu.rating.helper;
 
 import kiis.edu.rating.features.common.BaseResponse;
+import kiis.edu.rating.features.common.Status;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,16 +11,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static kiis.edu.rating.features.common.Status.BAD_REQUEST;
-import static kiis.edu.rating.features.common.Status.SERVER_ERROR;
+import static kiis.edu.rating.features.common.Status.*;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public BaseResponse<Object> exceptionHandle(Exception exception) {
-        if (exception instanceof IllegalArgumentException)
-            return new BaseResponse<>(BAD_REQUEST, exception.getMessage(), exception.getClass().getName());
-        return new BaseResponse<>(SERVER_ERROR, exception.getMessage(), exception.getClass().getName());
+        Status status = SERVER_ERROR;
+        if (exception instanceof IllegalArgumentException) status = INPUT_INVALID;
+        if (exception instanceof InvalidDataAccessApiUsageException) status = DATABASE_MAPPING_ERROR;
+        return new BaseResponse<>(status, exception.getMessage(), exception.getClass().getName());
     }
 }
