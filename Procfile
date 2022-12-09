@@ -1,1 +1,1 @@
-web: java -jar build/libs/*.war
+web: java -jar build/bootWarMainClassName.jar build/libs/*.war
