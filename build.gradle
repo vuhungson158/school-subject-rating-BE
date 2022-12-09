@@ -46,18 +46,17 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-//task stage(type: Copy, dependsOn: [clean, build]) {
-//    from jar.archivePath
-//    into project.rootDir
-//    rename {
-//        'app.jar'
-//    }
-//}
-//stage.mustRunAfter(clean)
-//
-//clean {
-//    doLast {
-//        project.file('app.jar').delete()
-//    }
-//}
-//web: java $JAVA_OPTS -Dserver.port=$PORT -jar app.jar
+
+tasks.register('stage') {
+    dependsOn clean, war
+}
+war.mustRunAfter clean
+
+tasks.register('copyToLib') {
+    into "$buildDir/server"
+    from(configurations.compile) {
+        include "webapp-runner*"
+    }
+}
+
+stage.dependsOn(copyToLib)
