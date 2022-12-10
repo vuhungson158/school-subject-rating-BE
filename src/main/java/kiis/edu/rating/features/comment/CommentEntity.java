@@ -1,5 +1,6 @@
 package kiis.edu.rating.features.comment;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import kiis.edu.rating.features.common.BaseEntity;
 import kiis.edu.rating.features.common.enums.RefTable;
 import lombok.AllArgsConstructor;
@@ -17,8 +18,13 @@ public class CommentEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     public RefTable refTable;
     public boolean disable;
+    @JsonIgnoreProperties(ignoreUnknown = true)
     @Column(insertable = false, updatable = false)
     public int likeCount;
+    @JsonIgnoreProperties(ignoreUnknown = true)
     @Column(insertable = false, updatable = false)
     public int dislikeCount;
+//    LinkedHashMap;
+//    HashMap
+
 }
