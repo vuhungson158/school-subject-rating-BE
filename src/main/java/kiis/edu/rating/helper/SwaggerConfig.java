@@ -15,26 +15,37 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Collections;
 
-import static kiis.edu.rating.helper.Constant.SECRET_KEY;
 import static kiis.edu.rating.helper.Constant.TOKEN_HEADER;
 
+@EnableSwagger2
 @Configuration
 public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .securitySchemes(Collections.singletonList(
+                                new ApiKey("JWT Token", TOKEN_HEADER, "header")
+                        )
+                )
+                .securityContexts(
+                        Collections.singletonList(SecurityContext.builder()
+                                .securityReferences(
+                                        Collections.singletonList(
+                                                new SecurityReference(
+                                                        "JWT Token",
+                                                        new AuthorizationScope[]{
+                                                                new AuthorizationScope("global", "accessEverything")
+                                                        }
+                                                )
+                                        )
+                                )
+                                .build()
+                        )
+                )
                 .select()
                 .apis(RequestHandlerSelectors.basePackage(RatingApplication.class.getPackage().getName()))
                 .paths(PathSelectors.any())
                 .build();
-//                .securityContexts(Collections.singletonList(
-//                        SecurityContext.builder()
-//                                .securityReferences(Collections.singletonList(
-//                                        new SecurityReference(SECRET_KEY, new AuthorizationScope[]{
-//                                                new AuthorizationScope("global", "accessEverything")})))
-//                                .build()))
-//                .securitySchemes(Collections.singletonList(
-//                        new ApiKey(SECRET_KEY, TOKEN_HEADER, "header")));
     }
 
 }

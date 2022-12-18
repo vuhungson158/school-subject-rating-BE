@@ -37,7 +37,7 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
                     .parseClaimsJws(token)
                     .getBody();
             String username = claimsJwsBody.getSubject();
-            UserRole role = (UserRole) claimsJwsBody.get(CLAIM_AUTHORITY);
+            UserRole role = UserRole.valueOf((String) claimsJwsBody.get(CLAIM_AUTHORITY));
             Set<SimpleGrantedAuthority> simpleGrantedAuthorities = role.getGrantedAuthorities();
 
             Authentication authentication =

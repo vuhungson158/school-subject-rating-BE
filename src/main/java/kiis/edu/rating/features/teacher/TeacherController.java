@@ -6,6 +6,7 @@ import kiis.edu.rating.features.teacher.rating.TeacherRatingEntity;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,11 +43,13 @@ public class TeacherController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
     public void create(@RequestBody TeacherRequest request) {
         teacherRepository.save(request.toEntity());
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('TEACHER_UPDATE')")
     public void update(@PathVariable long id, @RequestBody TeacherRequest request) {
         if (!teacherRepository.existsById(id))
             throw new IllegalArgumentException("No Teacher with ID:" + id);
@@ -56,6 +59,7 @@ public class TeacherController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('TEACHER_DELETE')")
     public void delete(@PathVariable long id) {
         Optional<TeacherEntity> optionalTeacher = teacherRepository.findById(id);
         if (!optionalTeacher.isPresent()) throw new IllegalArgumentException("No Teacher with Id: " + id);
@@ -89,7 +93,8 @@ public class TeacherController {
     }
 
     @PostMapping(RATING_PATH + "")
-    public void createRating(@RequestBody @Valid RatingRequest request) {
+    @PreAuthorize("hasAuthority('TEACHER_RATING_CREATE')")
+    public void createRating(@RequestBody @Valid TeacherRatingRequest request) {
         long teacherId = request.teacherId;
         long userId = request.userId;
         if (!teacherRepository.existsById(teacherId))
@@ -102,7 +107,8 @@ public class TeacherController {
     }
 
     @PutMapping(RATING_PATH + "/{id}")
-    public void updateRating(@PathVariable long id, @RequestBody @Valid RatingRequest request) {
+    @PreAuthorize("hasAuthority('TEACHER_RATING_UPDATE')")
+    public void updateRating(@PathVariable long id, @RequestBody @Valid TeacherRatingRequest request) {
         if (!teacherRatingRepository.existsById(id))
             throw new IllegalArgumentException("No Rating with Id: " + id);
         TeacherRatingEntity ratingEntity = request.toEntity();
@@ -111,6 +117,7 @@ public class TeacherController {
     }
 
     @DeleteMapping(RATING_PATH + "/{id}")
+    @PreAuthorize("hasAuthority('TEACHER_RATING_DELETE')")
     public void deleteRating(@PathVariable long id) {
         teacherRatingRepository.deleteById(id);
     }
@@ -151,7 +158,7 @@ public class TeacherController {
     }
 
     @AllArgsConstructor
-    private static class RatingRequest implements RequestDTO {
+    private static class TeacherRatingRequest implements RequestDTO {
         public long userId, teacherId;
         @Min(value = 0, message = "Min = 0")
         @Max(value = 100, message = "Max = 100")

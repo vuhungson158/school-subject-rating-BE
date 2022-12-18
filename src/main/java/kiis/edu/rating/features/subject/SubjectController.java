@@ -7,6 +7,7 @@ import kiis.edu.rating.features.subject.rating.SubjectRatingRepository;
 import kiis.edu.rating.features.teacher.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -43,6 +44,7 @@ public class SubjectController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
     public void create(@RequestBody @Valid SubjectRequest request) {
         if (!teacherRepository.existsById(request.teacherId))
             throw new IllegalArgumentException("No teacher with id : " + request.teacherId);
@@ -50,6 +52,7 @@ public class SubjectController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('SUBJECT_UPDATE')")
     public void update(@PathVariable long id, @RequestBody @Valid SubjectRequest request) {
         if (!subjectRepository.existsById(id))
             throw new IllegalArgumentException("No Subject with Id: " + id);
@@ -59,6 +62,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SUBJECT_DELETE')")
     public void delete(@PathVariable long id) {
         Optional<SubjectEntity> optionalSubject = subjectRepository.findById(id);
         if (!optionalSubject.isPresent()) throw new IllegalArgumentException("No Subject with Id: " + id);
@@ -94,7 +98,8 @@ public class SubjectController {
     }
 
     @PostMapping(RATING_PATH + "")
-    public void createRating(@RequestBody @Valid RatingRequest request) {
+    @PreAuthorize("hasAuthority('SUBJECT_RATING_CREATE')")
+    public void createRating(@RequestBody @Valid SubjectRatingRequest request) {
         long subjectId = request.subjectId;
         long userId = request.userId;
         if (!subjectRepository.existsById(subjectId))
@@ -107,7 +112,8 @@ public class SubjectController {
     }
 
     @PutMapping(RATING_PATH + "/{id}")
-    public void updateRating(@PathVariable long id, @RequestBody @Valid RatingRequest request) {
+    @PreAuthorize("hasAuthority('SUBJECT_RATING_UPDATE')")
+    public void updateRating(@PathVariable long id, @RequestBody @Valid SubjectRatingRequest request) {
         if (!subjectRatingRepository.existsById(id))
             throw new IllegalArgumentException("No Rating with Id: " + id);
         SubjectRatingEntity subjectRatingEntity = request.toEntity();
@@ -116,6 +122,7 @@ public class SubjectController {
     }
 
     @DeleteMapping(RATING_PATH + "/{id}")
+    @PreAuthorize("hasAuthority('SUBJECT_RATING_DELETE')")
     public void deleteRating(@PathVariable long id) {
         subjectRatingRepository.deleteById(id);
     }
@@ -160,15 +167,14 @@ public class SubjectController {
         public int formYear;
         public String name;
         public Specialize specialize;
-        public boolean disable;
 
         public SubjectEntity toEntity() {
-            return new SubjectEntity(teacherId, unit, formYear, name, specialize, disable);
+            return new SubjectEntity(teacherId, unit, formYear, name, specialize, false);
         }
     }
 
     @AllArgsConstructor
-    private static class RatingRequest implements RequestDTO {
+    private static class SubjectRatingRequest implements RequestDTO {
         public long userId, subjectId;
         @Min(value = 0, message = "Min = 0")
         @Max(value = 100, message = "Max = 100")

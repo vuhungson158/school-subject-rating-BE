@@ -8,6 +8,7 @@ import kiis.edu.rating.features.subject.SubjectRepository;
 import kiis.edu.rating.features.teacher.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -53,6 +54,7 @@ public class CommentController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority('COMMENT_CREATE')")
     public void create(@RequestBody @Valid CommentRequest request) {
         String refTable = request.refTable.name();
         long userId = request.userId;
@@ -73,6 +75,7 @@ public class CommentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('COMMENT_UPDATE')")
     public void update(@PathVariable long id, @RequestBody @Valid CommentRequest request) {
         if (!commentRepository.existsById(id))
             throw new IllegalArgumentException("No comment with id : " + id);
@@ -82,6 +85,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('COMMENT_DELETE')")
     public void delete(@PathVariable long id) {
         commentRepository.deleteById(id);
     }
@@ -101,6 +105,7 @@ public class CommentController {
     }
 
     @PostMapping(RATING_PATH + "")
+    @PreAuthorize("hasAuthority('COMMENT_RATING_CREATE')")
     public void createRating(@RequestBody RatingRequest request) {
         checkCommentExist(request.commentId);
         checkUserExist(request.userId);
@@ -110,6 +115,7 @@ public class CommentController {
     }
 
     @PutMapping(RATING_PATH + "/{id}")
+    @PreAuthorize("hasAuthority('COMMENT_RATING_UPDATE')")
     public void updateRating(@PathVariable long id, @RequestBody RatingRequest request) {
         if (!commentRatingRepository.existsById(id))
             throw new IllegalArgumentException("No comment Rating with id : " + id);
@@ -119,6 +125,7 @@ public class CommentController {
     }
 
     @DeleteMapping(RATING_PATH + "/{id}")
+    @PreAuthorize("hasAuthority('COMMENT_RATING_DELETE')")
     public void deleteRating(@PathVariable long id) {
         commentRatingRepository.deleteById(id);
     }
