@@ -22,3 +22,9 @@ public class TeacherEntity extends BaseEntity {
     public Instant dob;
     public boolean disable;
 }
+
+@Entity
+@AllArgsConstructor
+class TeacherEntityWithRating extends TeacherEntity {
+    public double enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel;
+}

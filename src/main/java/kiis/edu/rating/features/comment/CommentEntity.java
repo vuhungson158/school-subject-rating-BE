@@ -4,7 +4,6 @@ import kiis.edu.rating.features.common.BaseEntity;
 import kiis.edu.rating.features.common.enums.RefTable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -21,8 +20,12 @@ public class CommentEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     public RefTable refTable;
     public boolean disable;
-    @Formula(value = "count(if(react=1,1,null))")
+}
+
+@Entity
+class CommentEntityWithLikeCount extends CommentEntity {
     public int likeCount;
-    @Formula(value = "case when count(if(react=0,1,null))")
     public int dislikeCount;
 }
+
+

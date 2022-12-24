@@ -30,12 +30,10 @@ public class SubjectController {
     private final UserRepository userRepository;
 
     @GetMapping("/{id}")
-    public SubjectWithAverageScore getById(@PathVariable long id) {
-        Optional<SubjectEntity> optionalSubject = subjectRepository.findById(id);
-        if (!optionalSubject.isPresent())
+    public SubjectEntityWithRating getById(@PathVariable long id) {
+        if (!subjectRepository.existsById(id))
             throw new IllegalArgumentException("No subject with id : " + id);
-        List<SubjectRatingEntity> allRating = getRatingsBySubjectId(id);
-        return new SubjectWithAverageScore(optionalSubject.get(), getAverageScore(allRating));
+        return subjectRepository.findSubjectEntityWithRatingById(id);
     }
 
     @GetMapping("")
@@ -91,11 +89,11 @@ public class SubjectController {
         return subjectRatingRepository.findAllByUserId(userId);
     }
 
-    @GetMapping(RATING_PATH + "/userId/average/{id}")
-    public AverageScore getRatingsAverageByUserId(@PathVariable("id") long userId) {
-        List<SubjectRatingEntity> allRating = subjectRatingRepository.findAllByUserId(userId);
-        return getAverageScore(allRating);
-    }
+//    @GetMapping(RATING_PATH + "/userId/average/{id}")
+//    public AverageScore getRatingsAverageByUserId(@PathVariable("id") long userId) {
+//        List<SubjectRatingEntity> allRating = subjectRatingRepository.findAllByUserId(userId);
+//        return new AverageScore(allRating);
+//    }
 
     @PostMapping(RATING_PATH + "")
     @PreAuthorize("hasAuthority('SUBJECT_RATING_CREATE')")
@@ -125,35 +123,6 @@ public class SubjectController {
     @PreAuthorize("hasAuthority('SUBJECT_RATING_DELETE')")
     public void deleteRating(@PathVariable long id) {
         subjectRatingRepository.deleteById(id);
-    }
-
-    private AverageScore getAverageScore(List<SubjectRatingEntity> allRating) {
-        int practicality = 0, difficult = 0, homework = 0, testDifficult = 0, teacherPedagogical = 0;
-        for (SubjectRatingEntity rating : allRating) {
-            practicality += rating.practicality;
-            difficult += rating.difficult;
-            homework += rating.homework;
-            testDifficult += rating.testDifficult;
-            teacherPedagogical += rating.teacherPedagogical;
-        }
-        int listSize = allRating.size();
-        practicality = practicality / listSize;
-        difficult = difficult / listSize;
-        homework = homework / listSize;
-        testDifficult = testDifficult / listSize;
-        teacherPedagogical = teacherPedagogical / listSize;
-        return new AverageScore(practicality, difficult, homework, testDifficult, teacherPedagogical, listSize);
-    }
-
-    @AllArgsConstructor
-    private static class AverageScore {
-        public double practicality, difficult, homework, testDifficult, teacherPedagogical, size;
-    }
-
-    @AllArgsConstructor
-    private static class SubjectWithAverageScore {
-        public SubjectEntity subject;
-        public AverageScore averageScore;
     }
 
     @AllArgsConstructor

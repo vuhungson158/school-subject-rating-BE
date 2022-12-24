@@ -22,3 +22,9 @@ public class SubjectEntity extends BaseEntity {
     public Specialize specialize;
     public boolean disable;
 }
+
+@Entity
+@AllArgsConstructor
+class SubjectEntityWithRating extends SubjectEntity {
+    public double practicality, difficult, homework, testDifficult, teacherPedagogical;
+}

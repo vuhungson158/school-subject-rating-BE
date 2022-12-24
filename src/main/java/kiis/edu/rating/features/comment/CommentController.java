@@ -7,6 +7,7 @@ import kiis.edu.rating.features.common.enums.RefTable;
 import kiis.edu.rating.features.subject.SubjectRepository;
 import kiis.edu.rating.features.teacher.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,19 +32,20 @@ public class CommentController {
     private final UserRepository userRepository;
 
     @GetMapping("/{id}")
-    public CommentEntity getById(@PathVariable long id) {
+    public CommentEntityWithLikeCount getById(@PathVariable long id) {
         Optional<CommentEntity> optionalComment = commentRepository.findById(id);
         if (!optionalComment.isPresent())
             throw new IllegalArgumentException("No comment with id : " + id);
-        CommentEntity commentEntity = optionalComment.get();
+        CommentEntityWithLikeCount commentEntityWithLikeCount = Util.mapping(optionalComment.get(), CommentEntityWithLikeCount.class);
         ReactCount reactCount = countReact(id);
-        commentEntity.likeCount = reactCount.like;
-        commentEntity.dislikeCount = reactCount.dislike;
-        return commentEntity;
+        assert commentEntityWithLikeCount != null;
+        commentEntityWithLikeCount.likeCount = reactCount.like;
+        commentEntityWithLikeCount.dislikeCount = reactCount.dislike;
+        return commentEntityWithLikeCount;
     }
 
     @PostMapping("/top-comment/")
-    public List<CommentEntity> getTopRatingById(@RequestBody TopCommentRequest request) {
+    public List<CommentEntityWithLikeCount> getTopRatingById(@RequestBody TopCommentRequest request) {
         return commentRepository
                 .findTopRatingComment(request.limit, request.page, request.refTable, request.refId);
     }
@@ -156,7 +158,7 @@ public class CommentController {
         public boolean disable;
 
         public CommentEntity toEntity() {
-            return new CommentEntity(userId, refId, comment, refTable, false, 0, 0);
+            return new CommentEntity(userId, refId, comment, refTable, false);
         }
     }
 

@@ -29,12 +29,10 @@ public class TeacherController {
     private final TeacherRatingRepository teacherRatingRepository;
 
     @GetMapping("/{id}")
-    public TeacherWithAverageScore getById(@PathVariable long id) {
-        Optional<TeacherEntity> optionalTeacher = teacherRepository.findById(id);
-        if (!optionalTeacher.isPresent())
+    public TeacherEntityWithRating getById(@PathVariable long id) {
+        if (!teacherRepository.existsById(id))
             throw new IllegalArgumentException("No teacher with id : " + id);
-        List<TeacherRatingEntity> allRating = getRatingsByTeacherId(id);
-        return new TeacherWithAverageScore(optionalTeacher.get(), getAverageScore(allRating));
+        return teacherRepository.findTeacherEntityWithRatingById(id);
     }
 
     @GetMapping("")
@@ -86,11 +84,11 @@ public class TeacherController {
         return teacherRatingRepository.findAllByUserId(userId);
     }
 
-    @GetMapping(RATING_PATH + "/userId/average/{id}")
-    public AverageScore getRatingsAverageByUserId(@PathVariable("id") long userId) {
-        List<TeacherRatingEntity> allRating = teacherRatingRepository.findAllByUserId(userId);
-        return getAverageScore(allRating);
-    }
+//    @GetMapping(RATING_PATH + "/userId/average/{id}")
+//    public AverageScore getRatingsAverageByUserId(@PathVariable("id") long userId) {
+//        List<TeacherRatingEntity> allRating = teacherRatingRepository.findAllByUserId(userId);
+//        return getAverageScore(allRating);
+//    }
 
     @PostMapping(RATING_PATH + "")
     @PreAuthorize("hasAuthority('TEACHER_RATING_CREATE')")
@@ -120,29 +118,6 @@ public class TeacherController {
     @PreAuthorize("hasAuthority('TEACHER_RATING_DELETE')")
     public void deleteRating(@PathVariable long id) {
         teacherRatingRepository.deleteById(id);
-    }
-
-    private AverageScore getAverageScore(List<TeacherRatingEntity> allRating) {
-        int enthusiasm = 0, friendly = 0, nonConservatism = 0, erudition = 0, pedagogicalLevel = 0;
-        for (TeacherRatingEntity rating : allRating) {
-            enthusiasm += rating.enthusiasm;
-            friendly += rating.friendly;
-            nonConservatism += rating.nonConservatism;
-            erudition += rating.erudition;
-            pedagogicalLevel += rating.pedagogicalLevel;
-        }
-        int listSize = allRating.size();
-        enthusiasm = enthusiasm / listSize;
-        friendly = friendly / listSize;
-        nonConservatism = nonConservatism / listSize;
-        erudition = erudition / listSize;
-        pedagogicalLevel = pedagogicalLevel / listSize;
-        return new AverageScore(enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel, listSize);
-    }
-
-    @AllArgsConstructor
-    private static class AverageScore {
-        public double enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel, size;
     }
 
     @AllArgsConstructor
@@ -180,11 +155,4 @@ public class TeacherController {
             return new TeacherRatingEntity(userId, teacherId, enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel);
         }
     }
-
-    @AllArgsConstructor
-    private static class TeacherWithAverageScore {
-        public TeacherEntity subject;
-        public AverageScore averageScore;
-    }
-
 }

@@ -25,7 +25,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
                     + "group by comment.id "
                     + "order by count(*) desc limit :page, :limit "
     )
-    List<CommentEntity> findTopRatingComment(
+    List<CommentEntityWithLikeCount> findTopRatingComment(
             @Param("limit") int limit, @Param("page") int page,
             @Param("refTable") String refTable, @Param("refId") long refId
     );
