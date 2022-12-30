@@ -17,9 +17,9 @@ public class ControllerExceptionHandler {
         if (exception instanceof IllegalArgumentException) {
             status = HttpStatus.BAD_REQUEST;
         }
-        if (exception instanceof InvalidDataAccessApiUsageException) {
-            message = "Mapping to DB error";
-        }
+//        if (exception instanceof InvalidDataAccessApiUsageException) {
+//            message = "Mapping to DB error";
+//        }
         if (exception instanceof AccessDeniedException) {
             status = HttpStatus.FORBIDDEN;
             message = "Your Role doesn't have permission to call this API";

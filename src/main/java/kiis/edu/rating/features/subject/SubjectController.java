@@ -6,6 +6,7 @@ import kiis.edu.rating.features.subject.rating.SubjectRatingEntity;
 import kiis.edu.rating.features.subject.rating.SubjectRatingRepository;
 import kiis.edu.rating.features.teacher.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -138,7 +139,7 @@ public class SubjectController {
         public Specialize specialize;
 
         public SubjectEntity toEntity() {
-            return new SubjectEntity(teacherId, unit, formYear, name, specialize, false);
+            return Util.mapping(this, SubjectEntity.class);
         }
     }
 
