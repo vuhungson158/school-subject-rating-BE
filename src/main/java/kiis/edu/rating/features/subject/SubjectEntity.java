@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "subject")
@@ -15,14 +16,16 @@ public class SubjectEntity extends BaseSubjectEntity {
 }
 
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-class SubjectEntityWithRating extends BaseSubjectEntity {
-    public double practicality, difficult, homework, testDifficult, teacherPedagogical;
+class SubjectWithAvgRating extends BaseSubjectEntity {
+    public BigDecimal practicality, difficult, homework, testDifficult, teacherPedagogical;
 }
 
 @MappedSuperclass
 @AllArgsConstructor
 @NoArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 class BaseSubjectEntity extends BaseEntity {
     public long teacherId;
     public int unit, formYear;

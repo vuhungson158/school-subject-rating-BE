@@ -9,7 +9,11 @@ import java.util.List;
 @Repository
 public interface SubjectRepository extends JpaRepository<SubjectEntity, Long> {
     List<SubjectEntity> findAllByDisable(boolean disable);
+}
 
+
+@Repository
+interface SubjectWithAvgRatingRepository extends JpaRepository<SubjectWithAvgRating, Long> {
     @Query(nativeQuery = true, value =
             "select subject.*, "
                     + "avg(practicality) as practicality, "
@@ -23,5 +27,5 @@ public interface SubjectRepository extends JpaRepository<SubjectEntity, Long> {
                     + "where subject.id = ?1 "
                     + "group by subject.id limit 1"
     )
-    SubjectEntityWithRating findSubjectEntityWithRatingById(long id);
+    SubjectWithAvgRating findSubjectEntityWithRatingById(long id);
 }

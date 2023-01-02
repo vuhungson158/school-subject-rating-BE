@@ -26,15 +26,16 @@ import static kiis.edu.rating.helper.Constant.PATH;
 public class SubjectController {
     private final String RATING_PATH = "/rating";
     private final SubjectRepository subjectRepository;
+    private final SubjectWithAvgRatingRepository subjectWithAvgRatingRepository;
     private final TeacherRepository teacherRepository;
     private final SubjectRatingRepository subjectRatingRepository;
     private final UserRepository userRepository;
 
     @GetMapping("/{id}")
-    public SubjectEntityWithRating getById(@PathVariable long id) {
+    public SubjectWithAvgRating getById(@PathVariable long id) {
         if (!subjectRepository.existsById(id))
             throw new IllegalArgumentException("No subject with id : " + id);
-        return subjectRepository.findSubjectEntityWithRatingById(id);
+        return subjectWithAvgRatingRepository.findSubjectEntityWithRatingById(id);
     }
 
     @GetMapping("")
