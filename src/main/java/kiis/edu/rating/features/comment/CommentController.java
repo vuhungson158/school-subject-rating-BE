@@ -26,17 +26,18 @@ import static kiis.edu.rating.helper.Constant.PATH;
 public class CommentController {
     private final String RATING_PATH = "/rating";
     private final CommentRepository commentRepository;
+    private final CommentWithLikeCountRepository commentWithLikeCountRepository;
     private final CommentRatingRepository commentRatingRepository;
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
     private final UserRepository userRepository;
 
     @GetMapping("/{id}")
-    public CommentEntityWithLikeCount getById(@PathVariable long id) {
+    public CommentWithLikeCount getById(@PathVariable long id) {
         Optional<CommentEntity> optionalComment = commentRepository.findById(id);
         if (!optionalComment.isPresent())
             throw new IllegalArgumentException("No comment with id : " + id);
-        CommentEntityWithLikeCount commentEntityWithLikeCount = Util.mapping(optionalComment.get(), CommentEntityWithLikeCount.class);
+        CommentWithLikeCount commentEntityWithLikeCount = Util.mapping(optionalComment.get(), CommentWithLikeCount.class);
         ReactCount reactCount = countReact(id);
         assert commentEntityWithLikeCount != null;
         commentEntityWithLikeCount.likeCount = reactCount.like;
@@ -45,8 +46,8 @@ public class CommentController {
     }
 
     @PostMapping("/top-comment/")
-    public List<CommentEntityWithLikeCount> getTopRatingById(@RequestBody TopCommentRequest request) {
-        return commentRepository
+    public List<CommentWithLikeCount> getTopRatingById(@RequestBody TopCommentRequest request) {
+        return commentWithLikeCountRepository
                 .findTopRatingComment(request.limit, request.page, request.refTable, request.refId);
     }
 
@@ -158,7 +159,7 @@ public class CommentController {
         public boolean disable;
 
         public CommentEntity toEntity() {
-            return new CommentEntity(userId, refId, comment, refTable, false);
+            return Util.mapping(this, CommentEntity.class);
         }
     }
 

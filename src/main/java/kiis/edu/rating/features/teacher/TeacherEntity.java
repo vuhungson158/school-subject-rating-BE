@@ -5,26 +5,30 @@ import kiis.edu.rating.features.common.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
 @Table(name = "teacher")
 @AllArgsConstructor
+public class TeacherEntity extends BaseTeacherEntity {
+
+}
+
+@Entity
 @NoArgsConstructor
-public class TeacherEntity extends BaseEntity {
+@AllArgsConstructor
+class TeacherWithAvgRating extends BaseTeacherEntity {
+    public double enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel;
+}
+
+@MappedSuperclass
+@AllArgsConstructor
+@NoArgsConstructor
+abstract class BaseTeacherEntity extends BaseEntity {
     public String name, nationality;
     @Enumerated(EnumType.STRING)
     public Gender gender;
     public Instant dob;
-    public boolean disable;
-}
-
-@Entity
-@AllArgsConstructor
-class TeacherEntityWithRating extends TeacherEntity {
-    public double enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel;
+    public boolean disable = false;
 }

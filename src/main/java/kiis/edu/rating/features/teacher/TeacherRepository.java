@@ -9,6 +9,10 @@ import java.util.List;
 @Repository
 public interface TeacherRepository extends JpaRepository<TeacherEntity, Long> {
     List<TeacherEntity> findAllByDisable(boolean disable);
+}
+
+@Repository
+interface TeacherWithAvgRatingRepository extends JpaRepository<TeacherWithAvgRating, Long> {
 
     @Query(nativeQuery = true, value =
             "select teacher.*,"
@@ -23,5 +27,5 @@ public interface TeacherRepository extends JpaRepository<TeacherEntity, Long> {
                     + "where teacher.id = ?1"
                     + "group by teacher_rating.id"
     )
-    TeacherEntityWithRating findTeacherEntityWithRatingById(long id);
+    TeacherWithAvgRating findTeacherEntityWithRatingById(long id);
 }

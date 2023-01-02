@@ -25,8 +25,7 @@ class SubjectWithAvgRating extends BaseSubjectEntity {
 @MappedSuperclass
 @AllArgsConstructor
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-class BaseSubjectEntity extends BaseEntity {
+abstract class BaseSubjectEntity extends BaseEntity {
     public long teacherId;
     public int unit, formYear;
     public String name;

@@ -5,27 +5,28 @@ import kiis.edu.rating.features.common.enums.RefTable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "comment")
 @AllArgsConstructor
-@NoArgsConstructor
-public class CommentEntity extends BaseEntity {
-    public long userId, refId;
-    public String comment;
-    @Enumerated(EnumType.STRING)
-    public RefTable refTable;
-    public boolean disable;
+public class CommentEntity extends BaseCommentEntity {
+
 }
 
 @Entity
-class CommentEntityWithLikeCount extends CommentEntity {
+class CommentWithLikeCount extends BaseCommentEntity {
     public int likeCount;
     public int dislikeCount;
 }
 
-
+@MappedSuperclass
+@AllArgsConstructor
+@NoArgsConstructor
+abstract class BaseCommentEntity extends BaseEntity {
+    public long userId, refId;
+    public String comment;
+    @Enumerated(EnumType.STRING)
+    public RefTable refTable;
+    public boolean disable = false;
+}

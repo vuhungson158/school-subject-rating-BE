@@ -5,6 +5,7 @@ import kiis.edu.rating.features.common.enums.Gender;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingEntity;
 import kiis.edu.rating.features.teacher.rating.TeacherRatingRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +26,15 @@ import static kiis.edu.rating.helper.Constant.PATH;
 public class TeacherController {
     private final String RATING_PATH = "/rating";
     private final TeacherRepository teacherRepository;
+    private final TeacherWithAvgRatingRepository teacherWithAvgRatingRepository;
     private final UserRepository userRepository;
     private final TeacherRatingRepository teacherRatingRepository;
 
     @GetMapping("/{id}")
-    public TeacherEntityWithRating getById(@PathVariable long id) {
+    public TeacherWithAvgRating getById(@PathVariable long id) {
         if (!teacherRepository.existsById(id))
             throw new IllegalArgumentException("No teacher with id : " + id);
-        return teacherRepository.findTeacherEntityWithRatingById(id);
+        return teacherWithAvgRatingRepository.findTeacherEntityWithRatingById(id);
     }
 
     @GetMapping("")
@@ -128,7 +130,7 @@ public class TeacherController {
 
         @Override
         public TeacherEntity toEntity() {
-            return new TeacherEntity(name, nationality, gender, dob, false);
+            return Util.mapping(this, TeacherEntity.class);
         }
     }
 
@@ -152,7 +154,7 @@ public class TeacherController {
         public int pedagogicalLevel;
 
         public TeacherRatingEntity toEntity() {
-            return new TeacherRatingEntity(userId, teacherId, enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel);
+            return Util.mapping(this, TeacherRatingEntity.class);
         }
     }
 }

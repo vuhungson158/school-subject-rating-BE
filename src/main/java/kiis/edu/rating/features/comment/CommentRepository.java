@@ -12,7 +12,9 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     List<CommentEntity> findAllByDisable(boolean disable);
 
     boolean existsByRefTableAndRefIdAndUserId(String refTable, long refId, long userId);
+}
 
+interface CommentWithLikeCountRepository extends JpaRepository<CommentWithLikeCount, Long> {
     @Query(nativeQuery = true, value =
             "select comment.*, count(if(react=1,1,null)) as like_count, count(if(react=0,1,null)) as dislike_count from "
                     + "( "
@@ -25,7 +27,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
                     + "group by comment.id "
                     + "order by count(*) desc limit :page, :limit "
     )
-    List<CommentEntityWithLikeCount> findTopRatingComment(
+    List<CommentWithLikeCount> findTopRatingComment(
             @Param("limit") int limit, @Param("page") int page,
             @Param("refTable") String refTable, @Param("refId") long refId
     );

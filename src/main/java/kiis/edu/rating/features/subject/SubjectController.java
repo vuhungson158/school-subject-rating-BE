@@ -164,7 +164,7 @@ public class SubjectController {
         public int teacherPedagogical;
 
         public SubjectRatingEntity toEntity() {
-            return new SubjectRatingEntity(userId, subjectId, practicality, difficult, homework, testDifficult, teacherPedagogical);
+            return Util.mapping(this, SubjectRatingEntity.class);
         }
     }
 }
