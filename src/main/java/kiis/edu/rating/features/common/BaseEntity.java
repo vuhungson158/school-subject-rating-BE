@@ -22,4 +22,5 @@ public abstract class BaseEntity {
     @LastModifiedDate
     @Column(insertable = false, updatable = false)
     public Instant updatedAt;
+    public boolean disable = false;
 }

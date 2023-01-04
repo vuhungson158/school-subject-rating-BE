@@ -31,5 +31,4 @@ abstract class BaseSubjectEntity extends BaseEntity {
     public String name;
     @Enumerated(EnumType.STRING)
     public Specialize specialize;
-    public boolean disable = false;
 }

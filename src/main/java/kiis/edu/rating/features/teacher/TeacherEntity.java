@@ -30,5 +30,4 @@ abstract class BaseTeacherEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     public Gender gender;
     public Instant dob;
-    public boolean disable = false;
 }

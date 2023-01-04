@@ -28,5 +28,4 @@ abstract class BaseCommentEntity extends BaseEntity {
     public String comment;
     @Enumerated(EnumType.STRING)
     public RefTable refTable;
-    public boolean disable = false;
 }

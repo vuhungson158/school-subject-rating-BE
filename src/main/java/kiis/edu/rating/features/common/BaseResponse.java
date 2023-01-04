@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class BaseResponse<T> {
     public final int code;
-    public final String status, massage, errorClass;
+        public final String status, massage, errorClass;
     public final T data;
 
     public BaseResponse(HttpStatus status, String massage, String errorClass, T data) {
