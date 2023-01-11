@@ -17,6 +17,7 @@ import java.util.Collections;
 
 import static kiis.edu.rating.helper.Constant.TOKEN_HEADER;
 
+@SuppressWarnings("unused")
 @EnableSwagger2
 @Configuration
 public class SwaggerConfig {

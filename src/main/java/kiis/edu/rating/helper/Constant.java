@@ -13,10 +13,6 @@ public interface Constant {
     String TOKEN_HEADER = "Authorization";
     String CLAIM_AUTHORITY = "authorities";
     String BEARER = "Bearer ";
-//  Controller path
-    String PREFIX = "api";
-    String VERSION = "v1";
-    String PATH = "/" + PREFIX + "/" + VERSION;
 //  Logger
     Logger LOGGER = LoggerFactory.getLogger(Logger.class);
 }

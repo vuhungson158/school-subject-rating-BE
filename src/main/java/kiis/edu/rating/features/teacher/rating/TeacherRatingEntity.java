@@ -5,13 +5,24 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "teacher_rating")
-public class TeacherRatingEntity extends BaseEntity {
+class TeacherRatingEntity extends BaseEntity {
     public long userId, teacherId;
-    public int enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel;
+    public int enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel, star;
+}
+
+
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+class TeacherRatingAverage {
+    @Id
+    public long total;
+    public double enthusiasm, friendly, nonConservatism, erudition, pedagogicalLevel, star;
 }

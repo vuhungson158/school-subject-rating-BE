@@ -1,4 +1,4 @@
-package kiis.edu.rating.features.comment;
+package kiis.edu.rating.features.teacher.comment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -8,18 +8,20 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
-    List<CommentEntity> findAllByDisable(boolean disable);
+public interface TeacherCommentRepository extends JpaRepository<TeacherCommentEntity, Long> {
+    List<TeacherCommentEntity> findAllByDisable(boolean disable);
 
-    boolean existsByRefTableAndRefIdAndUserId(String refTable, long refId, long userId);
+    boolean existsByTeacherIdAndUserId(long teacherId, long userId);
 }
 
-interface CommentWithLikeCountRepository extends JpaRepository<CommentWithLikeCount, Long> {
+@Repository
+interface TeacherCommentWithLikeCountRepository extends JpaRepository<TeacherCommentWithLikeCount, Long> {
+    //    TODO: Rewrite Query
     @Query(nativeQuery = true, value =
             "select comment.*, count(if(react=1,1,null)) as like_count, count(if(react=0,1,null)) as dislike_count from "
                     + "( "
                     + "select * from comment "
-                    + "where ref_table = :refTable and ref_id = :refId "
+                    + "where and ref_id = :id "
                     + ") "
                     + "as comment "
                     + "left join comment_rating "
@@ -27,8 +29,7 @@ interface CommentWithLikeCountRepository extends JpaRepository<CommentWithLikeCo
                     + "group by comment.id "
                     + "order by count(*) desc limit :page, :limit "
     )
-    List<CommentWithLikeCount> findTopRatingComment(
-            @Param("limit") int limit, @Param("page") int page,
-            @Param("refTable") String refTable, @Param("refId") long refId
+    List<TeacherCommentWithLikeCount> findTopRatingComment(
+            @Param("limit") int limit, @Param("page") int page, @Param("id") long id
     );
 }

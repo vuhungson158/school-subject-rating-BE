@@ -6,16 +6,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@SuppressWarnings("unused")
 @Configuration
 public class Beans {
     @Bean()
-    public static JwtTokenVerifier jwtTokenVerifier(){
+    public static JwtTokenVerifier jwtTokenVerifier() {
         return new JwtTokenVerifier();
     }
 
     @Bean()
-    public PasswordEncoder passwordEncoder (){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
-
 }

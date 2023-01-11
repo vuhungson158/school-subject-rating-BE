@@ -1,12 +1,12 @@
 package kiis.edu.rating.helper;
 
 import kiis.edu.rating.features.common.BaseResponse;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@SuppressWarnings("unused")
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
@@ -17,9 +17,6 @@ public class ControllerExceptionHandler {
         if (exception instanceof IllegalArgumentException) {
             status = HttpStatus.BAD_REQUEST;
         }
-//        if (exception instanceof InvalidDataAccessApiUsageException) {
-//            message = "Mapping to DB error";
-//        }
         if (exception instanceof AccessDeniedException) {
             status = HttpStatus.FORBIDDEN;
             message = "Your Role doesn't have permission to call this API";

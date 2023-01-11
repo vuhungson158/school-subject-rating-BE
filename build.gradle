@@ -38,8 +38,10 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-impl:$verJwt"
     implementation "io.jsonwebtoken:jjwt-jackson:$verJwt"
 //	Database
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation 'org.postgresql:postgresql'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    runtimeOnly 'com.mysql:mysql-connector-j'
+
 //	Helper
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

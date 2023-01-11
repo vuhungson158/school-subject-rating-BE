@@ -1,4 +1,4 @@
-package kiis.edu.rating.features.comment.rating;
+package kiis.edu.rating.features.subject.commentReact;
 
 import kiis.edu.rating.features.common.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,10 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "comment_rating")
+@Table(name = "subject_comment_react")
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentRatingEntity extends BaseEntity {
+class SubjectCommentReactEntity extends BaseEntity {
     public long userId, commentId;
-    // like = true, dislike = false
     public boolean react;
 }
