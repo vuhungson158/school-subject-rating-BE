@@ -27,15 +27,24 @@ public class SubjectCommentController {
                 .orElseThrow(() -> new IllegalArgumentException("No Comment with Id: " + id));
     }
 
-    @GetMapping("/{id}/top-comment/{limit}/{page}/")
-    public List<SubjectCommentWithLikeCount> getTopRatingById(@PathVariable long id, @PathVariable int limit, @PathVariable int page) {
-        return subjectCommentWithLikeCountRepository
-                .findTopRatingComment(limit, page, id);
-    }
-
     @GetMapping("")
     public List<SubjectCommentEntity> getAll() {
         return subjectCommentRepository.findAllByDisable(false);
+    }
+
+    @GetMapping("/top-comment/{subjectId}/{limit}/{page}/")
+    public ListWithTotal getTopBySubjectId
+            (@PathVariable("subjectId") long subjectId, @PathVariable("limit") int limit, @PathVariable("page") int page) {
+        return new ListWithTotal(
+                subjectCommentWithLikeCountRepository.countCommentBySubjectId(subjectId),
+                subjectCommentWithLikeCountRepository.findTopBySubjectId(limit, page, subjectId));
+    }
+
+    @GetMapping("/subjectId/{subjectId}/userId/{userId}")
+    public SubjectCommentWithLikeCount getBySubjectIdAndUserId
+            (@PathVariable("subjectId") long subjectId, @PathVariable("userId") long userId) {
+        return subjectCommentWithLikeCountRepository
+                .findBySubjectIdAndUserId(subjectId, userId);
     }
 
     @PostMapping("")
@@ -79,5 +88,11 @@ public class SubjectCommentController {
         public SubjectCommentEntity toEntity() {
             return Util.mapping(this, SubjectCommentEntity.class);
         }
+    }
+
+    @AllArgsConstructor
+    private static class ListWithTotal {
+        public int total;
+        public List<SubjectCommentWithLikeCount> list;
     }
 }

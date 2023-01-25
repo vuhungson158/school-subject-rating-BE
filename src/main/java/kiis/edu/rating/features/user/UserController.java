@@ -37,7 +37,7 @@ public class UserController {
                 .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusDays(1)))
                 .signWith(ENCODED_SECRET_KEY)
                 .compact();
-        return new LoginResponse(Util.mapping(userEntity, SimpleUserInfo.class), BEARER + token);
+        return new LoginResponse(userEntity, BEARER + token);
     }
 
     @GetMapping("/{id}")
@@ -105,7 +105,7 @@ public class UserController {
 
     @AllArgsConstructor
     private static class LoginResponse {
-        public SimpleUserInfo user;
+        public UserEntity user;
         public String token;
     }
 

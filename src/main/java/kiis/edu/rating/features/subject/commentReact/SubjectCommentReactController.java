@@ -31,9 +31,16 @@ public class SubjectCommentReactController {
             throw new IllegalArgumentException("No Comment with Id: " + commentId);
         return subjectCommentReactRepository.findByCommentId(commentId);
     }
+    @GetMapping("/userId/{userId}/list/{list}")
+    public List<SubjectCommentReactEntity> getByUserIdAndCommentIdList(
+            @PathVariable("userId") long userId, @PathVariable("list") List<Long> list) {
+        if (!userRepository.existsById(userId))
+            throw new IllegalArgumentException("No User with Id: " + userId);
+        return subjectCommentReactRepository.findByUserIdAndCommentIdList(userId, list);
+    }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority('COMMENT_RATING_CREATE')")
+    @PreAuthorize("hasAuthority('COMMENT_REACT_CREATE')")
     public void create(@RequestBody Request request) {
         if (!subjectCommentRepository.existsById(request.commentId))
             throw new IllegalArgumentException("No Comment with Id: " + request.commentId);
@@ -45,7 +52,7 @@ public class SubjectCommentReactController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_RATING_UPDATE')")
+    @PreAuthorize("hasAuthority('COMMENT_REACT_UPDATE')")
     public void update(@PathVariable long id, @RequestBody Request request) {
         if (!subjectCommentReactRepository.existsById(id))
             throw new IllegalArgumentException("No comment React with id : " + id);
@@ -55,7 +62,7 @@ public class SubjectCommentReactController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_RATING_DELETE')")
+    @PreAuthorize("hasAuthority('COMMENT_REACT_DELETE')")
     public void deleteRating(@PathVariable long id) {
         subjectCommentReactRepository.deleteById(id);
     }

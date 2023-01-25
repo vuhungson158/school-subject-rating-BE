@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SubjectCommentRepository extends JpaRepository<SubjectCommentEntity, Long> {
@@ -16,20 +17,60 @@ public interface SubjectCommentRepository extends JpaRepository<SubjectCommentEn
 
 @Repository
 interface SubjectCommentWithLikeCountRepository extends JpaRepository<SubjectCommentWithLikeCount, Long> {
-    //    TODO: Rewrite Query
     @Query(nativeQuery = true, value =
-            "select comment.*, count(if(react=1,1,null)) as like_count, count(if(react=0,1,null)) as dislike_count from "
-                    + "( "
-                    + "select * from comment "
-                    + "where and ref_id = :id "
-                    + ") "
-                    + "as comment "
-                    + "left join comment_rating "
-                    + "on comment.id = comment_rating.comment_id "
-                    + "group by comment.id "
-                    + "order by count(*) desc limit :page, :limit "
+            "select"
+                    + " \n subject_comment.*, "
+                    + " \n (select display_name from auth_user where id = subject_comment.user_id),"
+                    + " \n count(react = true or null) as like_count,"
+                    + " \n count(react = false or null) as dislike_count"
+                    + " \n from subject_comment"
+                    + " \n left join subject_comment_react"
+                    + " \n on subject_comment.id = subject_comment_react.comment_id"
+                    + " \n group by subject_comment.id"
+                    + " \n having subject_comment.subject_id = :subjectId"
+                    + " \n order by count(subject_comment_react) desc  "
+                    + " \n limit :limit offset :page "
     )
-    List<SubjectCommentWithLikeCount> findTopRatingComment(
-            @Param("limit") int limit, @Param("page") int page, @Param("id") long id
+    List<SubjectCommentWithLikeCount> findTopBySubjectId(
+            @Param("limit") int limit, @Param("page") int page, @Param("subjectId") long subjectId
     );
+
+    @Query(nativeQuery = true, value =
+            "select"
+                    + " \n count(*) "
+                    + " \n from subject_comment"
+                    + " \n where subject_comment.subject_id = :subjectId"
+    )
+    int countCommentBySubjectId(@Param("subjectId") long subjectId);
+
+    @Query(nativeQuery = true, value =
+            "select"
+                    + " \n subject_comment.*, "
+                    + " \n (select display_name from auth_user where id = :userId),"
+                    + " \n count(react = true or null) as like_count,"
+                    + " \n count(react = false or null) as dislike_count"
+                    + " \n from subject_comment"
+                    + " \n left join subject_comment_react"
+                    + " \n on subject_comment.id = subject_comment_react.comment_id"
+                    + " \n group by subject_comment.id"
+                    + " \n having subject_comment.user_id = :userId"
+                    + " \n and subject_comment.subject_id = :subjectId"
+                    + " \n limit 1"
+    )
+    SubjectCommentWithLikeCount findBySubjectIdAndUserId(@Param("subjectId") long subjectId, @Param("userId") long userId);
+
+    @Query(nativeQuery = true, value =
+            "select"
+                    + " \n subject_comment.*, "
+                    + " \n (select display_name from auth_user where id = subject_comment.user_id limit 1),"
+                    + " \n count(react = true or null) as like_count,"
+                    + " \n count(react = false or null) as dislike_count"
+                    + " \n from subject_comment"
+                    + " \n left join subject_comment_react"
+                    + " \n on subject_comment.id = subject_comment_react.comment_id"
+                    + " \n group by subject_comment.id"
+                    + " \n having subject_comment.id = :id"
+                    + " \n limit 1"
+    )
+    Optional<SubjectCommentWithLikeCount> findById(@Param("id") long id);
 }

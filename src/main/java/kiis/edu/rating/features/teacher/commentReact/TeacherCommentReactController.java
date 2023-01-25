@@ -33,7 +33,7 @@ public class TeacherCommentReactController {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority('COMMENT_RATING_CREATE')")
+    @PreAuthorize("hasAuthority('COMMENT_REACT_CREATE')")
     public void create(@RequestBody Request request) {
         if (!teacherCommentRepository.existsById(request.commentId))
             throw new IllegalArgumentException("No Comment with Id: " + request.commentId);
@@ -45,7 +45,7 @@ public class TeacherCommentReactController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_RATING_UPDATE')")
+    @PreAuthorize("hasAuthority('COMMENT_REACT_UPDATE')")
     public void update(@PathVariable long id, @RequestBody Request request) {
         if (!teacherCommentReactRepository.existsById(id))
             throw new IllegalArgumentException("No comment React with id : " + id);
@@ -55,7 +55,7 @@ public class TeacherCommentReactController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_RATING_DELETE')")
+    @PreAuthorize("hasAuthority('COMMENT_REACT_DELETE')")
     public void deleteRating(@PathVariable long id) {
         teacherCommentReactRepository.deleteById(id);
     }

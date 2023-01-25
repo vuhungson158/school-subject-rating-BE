@@ -40,11 +40,23 @@ public class TeacherRatingController {
         return teacherRatingRepository.findAllByUserId(userId);
     }
 
-    @GetMapping("/userId/average/{id}")
-    public TeacherRatingAverage getAverageByUserId(@PathVariable("id") long userId) {
-        return teacherRatingAverageRepository.findTeacherRatingAverageByTeacherId(userId);
+    @GetMapping("/teacherId/{teacherId}/userId/{userId}")
+    public TeacherRatingEntity getByTeacherIdAndUserId(
+            @PathVariable("teacherId") long teacherId, @PathVariable("userId") long userId) {
+        return teacherRatingRepository.findByTeacherIdAndUserId(teacherId, userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "This User hasn't rated this teacher yet"));
     }
 
+    @GetMapping("/average/userId/{id}")
+    public TeacherRatingAverage getAverageByUserId(@PathVariable("id") long userId) {
+        return teacherRatingAverageRepository.findTeacherRatingAverageByUserId(userId);
+    }
+
+    @GetMapping("/average/teacherId/{id}")
+    public TeacherRatingAverage getAverageByTeacherId(@PathVariable("id") long teacherId) {
+        return teacherRatingAverageRepository.findTeacherRatingAverageByTeacherId(teacherId);
+    }
     @PostMapping("")
     @PreAuthorize("hasAuthority('TEACHER_RATING_CREATE')")
     public void create(@RequestBody @Valid Request request) {
@@ -55,7 +67,7 @@ public class TeacherRatingController {
             throw new IllegalArgumentException("No Teacher with id : " + teacherId);
         if (!userRepository.existsById(userId))
             throw new IllegalArgumentException("No User with id : " + userId);
-        if (teacherRatingRepository.existsByTeacherIdAndUserId(teacherId, userId).isPresent())
+        if (teacherRatingRepository.existsByTeacherIdAndUserId(teacherId, userId))
             throw new IllegalArgumentException("This User has already rated this Teacher");
         teacherRatingRepository.save(request.toEntity());
     }
@@ -94,6 +106,9 @@ public class TeacherRatingController {
         @Min(value = 0, message = "Min = 0")
         @Max(value = 100, message = "Max = 100")
         public int pedagogicalLevel;
+        @Min(value = 0, message = "Min = 0")
+        @Max(value = 10, message = "Max = 10")
+        public int star;
 
         @Override
         public TeacherRatingEntity toEntity() {

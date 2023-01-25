@@ -2,6 +2,7 @@ package kiis.edu.rating.features.teacher.base;
 
 import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.common.enums.Gender;
+import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping(path = "/teacher")
 public class TeacherController {
     private final TeacherRepository teacherRepository;
+    private final SubjectRepository subjectRepository;
     private final UserRepository userRepository;
 
     @GetMapping("/{id}")
@@ -51,6 +53,7 @@ public class TeacherController {
     public void delete(@PathVariable long id) {
         TeacherEntity teacherEntity = teacherRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No Teacher with Id: " + id));
+        subjectRepository.updateDisableSubjectByTeacherId(id, true);
         teacherEntity.disable = true;
         teacherRepository.save(teacherEntity);
     }

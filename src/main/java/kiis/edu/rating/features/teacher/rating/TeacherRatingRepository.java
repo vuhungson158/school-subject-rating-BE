@@ -11,24 +11,42 @@ import java.util.Optional;
 interface TeacherRatingRepository extends JpaRepository<TeacherRatingEntity, Long> {
     List<TeacherRatingEntity> findAllByTeacherId(long teacherId);
     List<TeacherRatingEntity> findAllByUserId(long userId);
-    Optional<TeacherRatingEntity> existsByTeacherIdAndUserId(long teacherId, long userId);
+    boolean existsByTeacherIdAndUserId(long teacherId, long userId);
+    Optional<TeacherRatingEntity> findByTeacherIdAndUserId(long teacherId, long userId);
 }
 
 
 @Repository
 interface TeacherRatingAverageRepository extends JpaRepository<TeacherRatingAverage, Long> {
     @Query(nativeQuery = true, value =
-            "select teacher.*,"
-                    + "avg(enthusiasm) as enthusiasm,"
-                    + "avg(friendly) as friendly,"
-                    + "avg(non_conservatism) as non_conservatism,"
-                    + "avg(erudition) as erudition,"
-                    + "avg(pedagogical_level) as pedagogical_level"
-                    + "from teacher"
-                    + "left join teacher_rating"
-                    + "on teacher.id = teacher_rating.teacher_id"
-                    + "where teacher.id = ?1"
-                    + "group by teacher_rating.id"
+            "select"
+                    + "\n count(*) as total,"
+                    + "\n avg(enthusiasm) as enthusiasm,"
+                    + "\n avg(friendly) as friendly,"
+                    + "\n avg(non_conservatism) as non_conservatism,"
+                    + "\n avg(erudition) as erudition,"
+                    + "\n avg(pedagogical_level) as pedagogical_level,"
+                    + "\n avg(star) as star"
+                    + "\n from"
+                    + "\n teacher_rating"
+                    + "\n where"
+                    + "\n teacher_id = :id"
     )
     TeacherRatingAverage findTeacherRatingAverageByTeacherId(long id);
+
+    @Query(nativeQuery = true, value =
+            "select"
+                    + "\n count(*) as total,"
+                    + "\n avg(enthusiasm) as enthusiasm,"
+                    + "\n avg(friendly) as friendly,"
+                    + "\n avg(non_conservatism) as non_conservatism,"
+                    + "\n avg(erudition) as erudition,"
+                    + "\n avg(pedagogical_level) as pedagogical_level,"
+                    + "\n avg(star) as star"
+                    + "\n from"
+                    + "\n teacher_rating"
+                    + "\n where"
+                    + "\n user_id = :id"
+    )
+    TeacherRatingAverage findTeacherRatingAverageByUserId(long id);
 }

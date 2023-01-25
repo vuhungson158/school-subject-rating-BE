@@ -51,12 +51,12 @@ public class SubjectRatingController {
 
     @GetMapping("/average/userId/{id}")
     public SubjectRatingAverage getAverageByUserId(@PathVariable("id") long userId) {
-        return subjectRatingAverageRepository.findSubjectRatingAverageById(userId);
+        return subjectRatingAverageRepository.findSubjectRatingAverageByUserId(userId);
     }
 
     @GetMapping("/average/subjectId/{id}")
     public SubjectRatingAverage getAverageBySubjectId(@PathVariable("id") long subjectId) {
-        return subjectRatingAverageRepository.findSubjectRatingAverageById(subjectId);
+        return subjectRatingAverageRepository.findSubjectRatingAverageBySubjectId(subjectId);
     }
 
     @PostMapping("")
@@ -110,7 +110,7 @@ public class SubjectRatingController {
         @Max(value = 100, message = "Max = 100")
         public int teacherPedagogical;
         @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 10")
+        @Max(value = 10, message = "Max = 10")
         public int star;
 
         public SubjectRatingEntity toEntity() {

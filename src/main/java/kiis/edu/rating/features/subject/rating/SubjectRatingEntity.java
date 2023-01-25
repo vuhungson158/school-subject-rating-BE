@@ -25,5 +25,5 @@ public class SubjectRatingEntity extends BaseEntity {
 class SubjectRatingAverage{
     @Id
     public long total;
-    public BigDecimal practicality, difficult, homework, testDifficult, teacherPedagogical, star;
+    public double practicality, difficult, homework, testDifficult, teacherPedagogical, star;
 }
