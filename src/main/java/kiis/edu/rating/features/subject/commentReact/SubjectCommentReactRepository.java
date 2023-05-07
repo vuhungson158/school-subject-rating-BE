@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-interface SubjectCommentReactRepository extends JpaRepository<SubjectCommentReactEntity, Long> {
+public interface SubjectCommentReactRepository extends JpaRepository<SubjectCommentReactEntity, Long> {
     List<SubjectCommentReactEntity> findByCommentId(long commentId);
 
     boolean existsByUserIdAndCommentId(long userId, long commentId);

@@ -49,6 +49,6 @@ dependencies {
     implementation 'io.springfox:springfox-boot-starter:3.0.0' // Swagger
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+//tasks.named('test') {
+//    useJUnitPlatform()
+//}

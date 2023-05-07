@@ -4,10 +4,11 @@ import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.common.enums.Specialize;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.features.user.UserRole;
+import kiis.edu.rating.features.user.UserRole.Subject;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -36,16 +37,18 @@ public class SubjectController {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
-    public void create(@RequestBody @Valid Request request) {
+    public void create(@RequestBody @Valid SubjectRequest request) {
+        UserRole.requirePermission(Subject.CREATE);
+
         if (!teacherRepository.existsById(request.teacherId))
             throw new IllegalArgumentException("No teacher with id : " + request.teacherId);
         subjectRepository.save(request.toEntity());
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('SUBJECT_UPDATE')")
-    public void update(@PathVariable long id, @RequestBody @Valid Request request) {
+    public void update(@PathVariable long id, @RequestBody @Valid SubjectRequest request) {
+        UserRole.requirePermission(Subject.UPDATE);
+
         if (!subjectRepository.existsById(id))
             throw new IllegalArgumentException("No Subject with Id: " + id);
         SubjectEntity subjectEntity = request.toEntity();
@@ -54,8 +57,9 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SUBJECT_DELETE')")
     public void delete(@PathVariable long id) {
+        UserRole.requirePermission(Subject.DELETE);
+
         SubjectEntity subjectEntity = subjectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No subject with id : " + id));
         subjectEntity.disable = true;
@@ -64,7 +68,7 @@ public class SubjectController {
 
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class Request implements RequestDTO {
+    private static class SubjectRequest implements RequestDTO {
         public long teacherId;
         @Min(value = 1, message = "Min = 1")
         @Max(value = 6, message = "Max = 6")

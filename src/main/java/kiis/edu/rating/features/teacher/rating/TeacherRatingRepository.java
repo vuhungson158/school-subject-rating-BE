@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-interface TeacherRatingRepository extends JpaRepository<TeacherRatingEntity, Long> {
+public interface TeacherRatingRepository extends JpaRepository<TeacherRatingEntity, Long> {
     List<TeacherRatingEntity> findAllByTeacherId(long teacherId);
     List<TeacherRatingEntity> findAllByUserId(long userId);
     boolean existsByTeacherIdAndUserId(long teacherId, long userId);

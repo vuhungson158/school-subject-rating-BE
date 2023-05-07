@@ -34,13 +34,13 @@ public class TeacherController {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
-    public void create(@RequestBody Request request) {
+    public void create(@RequestBody TeacherRequest request) {
         teacherRepository.save(request.toEntity());
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('TEACHER_UPDATE')")
-    public void update(@PathVariable long id, @RequestBody Request request) {
+    public void update(@PathVariable long id, @RequestBody TeacherRequest request) {
         if (!teacherRepository.existsById(id))
             throw new IllegalArgumentException("No Teacher with ID:" + id);
         TeacherEntity teacherEntity = request.toEntity();
@@ -59,7 +59,7 @@ public class TeacherController {
     }
 
     @AllArgsConstructor
-    private static class Request implements RequestDTO {
+    private static class TeacherRequest implements RequestDTO {
         public String name, nationality;
         public Gender gender;
 //        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)

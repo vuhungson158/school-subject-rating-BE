@@ -20,6 +20,7 @@ import java.io.IOException;
 @EnableWebSecurity
 @AllArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@SuppressWarnings("deprecation")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenVerifier jwtTokenVerifier;
 
