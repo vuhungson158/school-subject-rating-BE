@@ -3,9 +3,10 @@ package kiis.edu.rating.features.teacher.commentReact;
 import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.teacher.comment.TeacherCommentRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.features.user.UserRole;
+import kiis.edu.rating.features.user.UserRole.TeacherCommentReact;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,8 +34,9 @@ public class TeacherCommentReactController {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority('COMMENT_REACT_CREATE')")
-    public void create(@RequestBody Request request) {
+    public void create(@RequestBody TeacherCommentReactRequest request) {
+        UserRole.requirePermission(TeacherCommentReact.CREATE);
+
         if (!teacherCommentRepository.existsById(request.commentId))
             throw new IllegalArgumentException("No Comment with Id: " + request.commentId);
         if (!userRepository.existsById(request.userId))
@@ -45,8 +47,9 @@ public class TeacherCommentReactController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_REACT_UPDATE')")
-    public void update(@PathVariable long id, @RequestBody Request request) {
+    public void update(@PathVariable long id, @RequestBody TeacherCommentReactRequest request) {
+        UserRole.requirePermission(TeacherCommentReact.UPDATE);
+
         if (!teacherCommentReactRepository.existsById(id))
             throw new IllegalArgumentException("No comment React with id : " + id);
         TeacherCommentReactEntity teacherCommentReactEntity = request.toEntity();
@@ -55,13 +58,14 @@ public class TeacherCommentReactController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_REACT_DELETE')")
     public void deleteRating(@PathVariable long id) {
+        UserRole.requirePermission(TeacherCommentReact.DELETE);
+
         teacherCommentReactRepository.deleteById(id);
     }
 
     @AllArgsConstructor
-    private static class Request implements RequestDTO {
+    private static class TeacherCommentReactRequest implements RequestDTO {
         public long userId, commentId;
         public boolean react;
 

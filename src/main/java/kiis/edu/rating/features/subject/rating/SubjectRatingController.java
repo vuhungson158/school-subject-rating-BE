@@ -3,9 +3,10 @@ package kiis.edu.rating.features.subject.rating;
 import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.features.user.UserRole;
+import kiis.edu.rating.features.user.UserRole.SubjectRating;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -60,8 +61,9 @@ public class SubjectRatingController {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority('SUBJECT_RATING_CREATE')")
-    public void create(@RequestBody @Valid Request request) {
+    public void create(@RequestBody @Valid SubjectRatingRequest request) {
+        UserRole.requirePermission(SubjectRating.CREATE);
+
         long subjectId = request.subjectId;
         long userId = request.userId;
 
@@ -76,8 +78,9 @@ public class SubjectRatingController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('SUBJECT_RATING_UPDATE')")
-    public void update(@PathVariable long id, @RequestBody @Valid Request request) {
+    public void update(@PathVariable long id, @RequestBody @Valid SubjectRatingRequest request) {
+        UserRole.requirePermission(SubjectRating.UPDATE);
+
         if (!subjectRatingRepository.existsById(id))
             throw new IllegalArgumentException("No Rating with Id: " + id);
         SubjectRatingEntity subjectRatingEntity = request.toEntity();
@@ -86,13 +89,14 @@ public class SubjectRatingController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SUBJECT_RATING_DELETE')")
     public void delete(@PathVariable long id) {
+        UserRole.requirePermission(SubjectRating.DELETE);
+
         subjectRatingRepository.deleteById(id);
     }
 
     @AllArgsConstructor
-    private static class Request implements RequestDTO {
+    private static class SubjectRatingRequest implements RequestDTO {
         public long userId, subjectId;
         @Min(value = 0, message = "Min = 0")
         @Max(value = 100, message = "Max = 100")

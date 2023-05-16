@@ -1,13 +1,12 @@
 package kiis.edu.rating.features.user;
 
 import kiis.edu.rating.features.common.BaseEntity;
-import kiis.edu.rating.features.common.enums.Gender;
-import kiis.edu.rating.features.common.enums.PostgreSQLEnumType;
+import kiis.edu.rating.enums.Gender;
+import kiis.edu.rating.enums.PostgreSQLEnumType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
 

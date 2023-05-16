@@ -3,9 +3,10 @@ package kiis.edu.rating.features.subject.comment;
 import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.features.user.UserRole;
+import kiis.edu.rating.features.user.UserRole.SubjectComment;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,33 +24,38 @@ public class SubjectCommentController {
 
     @GetMapping("/{id}")
     public SubjectCommentWithLikeCount getById(@PathVariable long id) {
+        UserRole.requirePermission(SubjectComment.GET_BY_ID);
+
         return subjectCommentWithLikeCountRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No Comment with Id: " + id));
     }
 
     @GetMapping("")
-    public List<SubjectCommentEntity> getAll() {
+    public List<SubjectCommentEntity> getAllEnable() {
+        UserRole.requirePermission(SubjectComment.GET_ALL);
+
         return subjectCommentRepository.findAllByDisable(false);
     }
 
-    @GetMapping("/top-comment/{subjectId}/{limit}/{page}/")
+    @GetMapping("/top-comment")
     public ListWithTotal getTopBySubjectId
-            (@PathVariable("subjectId") long subjectId, @PathVariable("limit") int limit, @PathVariable("page") int page) {
+            (@RequestParam long subjectId, @RequestParam int limit, @RequestParam int page) {
         return new ListWithTotal(
                 subjectCommentWithLikeCountRepository.countCommentBySubjectId(subjectId),
                 subjectCommentWithLikeCountRepository.findTopBySubjectId(limit, page, subjectId));
     }
 
-    @GetMapping("/subjectId/{subjectId}/userId/{userId}")
+    @GetMapping(value = "/my")
     public SubjectCommentWithLikeCount getBySubjectIdAndUserId
-            (@PathVariable("subjectId") long subjectId, @PathVariable("userId") long userId) {
+            (@RequestParam long subjectId, @RequestParam long userId) {
         return subjectCommentWithLikeCountRepository
                 .findBySubjectIdAndUserId(subjectId, userId);
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority('COMMENT_CREATE')")
-    public void create(@RequestBody @Valid Request request) {
+    public void create(@RequestBody @Valid SubjectCommentRequest request) {
+        UserRole.requirePermission(SubjectComment.CREATE);
+
         long userId = request.userId;
         long subjectId = request.subjectId;
 
@@ -64,8 +70,9 @@ public class SubjectCommentController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_UPDATE')")
-    public void update(@PathVariable long id, @RequestBody @Valid Request request) {
+    public void update(@PathVariable long id, @RequestBody @Valid SubjectCommentRequest request) {
+        UserRole.requirePermission(SubjectComment.UPDATE);
+
         if (!subjectCommentRepository.existsById(id))
             throw new IllegalArgumentException("No comment with id : " + id);
         SubjectCommentEntity commentEntity = request.toEntity();
@@ -74,13 +81,14 @@ public class SubjectCommentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_DELETE')")
     public void delete(@PathVariable long id) {
+        UserRole.requirePermission(SubjectComment.DELETE);
+
         subjectCommentRepository.deleteById(id);
     }
 
     @AllArgsConstructor
-    private static class Request implements RequestDTO {
+    private static class SubjectCommentRequest implements RequestDTO {
         public long userId, subjectId;
         public String comment;
 

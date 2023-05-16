@@ -1,4 +1,4 @@
-package kiis.edu.rating.features.common.enums;
+package kiis.edu.rating.enums;
 
 @SuppressWarnings("unused")
 public enum Gender {

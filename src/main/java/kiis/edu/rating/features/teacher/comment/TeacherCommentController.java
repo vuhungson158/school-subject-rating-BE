@@ -3,9 +3,10 @@ package kiis.edu.rating.features.teacher.comment;
 import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.features.user.UserRole;
+import kiis.edu.rating.features.user.UserRole.TeacherComment;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,10 +28,11 @@ public class TeacherCommentController {
                 .orElseThrow(() -> new IllegalArgumentException("No Comment with Id: " + id));
     }
 
-    @GetMapping("/{id}/top-comment/{limit}/{page}/")
-    public List<TeacherCommentWithLikeCount> getTopRatingById(@PathVariable long id, @PathVariable int limit, @PathVariable int page) {
+    @GetMapping("/top-comment")
+    public List<TeacherCommentWithLikeCount> getTopRatingById(
+            @RequestParam long teacherId, @RequestParam int limit, @RequestParam int page) {
         return teacherCommentWithLikeCountRepository
-                .findTopRatingComment(limit, page, id);
+                .findTopRatingComment(limit, page, teacherId);
     }
 
     @GetMapping("")
@@ -39,8 +41,9 @@ public class TeacherCommentController {
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority('COMMENT_CREATE')")
-    public void create(@RequestBody @Valid Request request) {
+    public void create(@RequestBody @Valid TeacherCommentRequest request) {
+        UserRole.requirePermission(TeacherComment.CREATE);
+
         long userId = request.userId;
         long teacherId = request.teacherId;
 
@@ -55,8 +58,9 @@ public class TeacherCommentController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_UPDATE')")
-    public void update(@PathVariable long id, @RequestBody @Valid Request request) {
+    public void update(@PathVariable long id, @RequestBody @Valid TeacherCommentRequest request) {
+        UserRole.requirePermission(TeacherComment.UPDATE);
+
         if (!teacherCommentRepository.existsById(id))
             throw new IllegalArgumentException("No comment with id : " + id);
         TeacherCommentEntity commentEntity = request.toEntity();
@@ -65,13 +69,14 @@ public class TeacherCommentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_DELETE')")
     public void delete(@PathVariable long id) {
+        UserRole.requirePermission(TeacherComment.DELETE);
+
         teacherCommentRepository.deleteById(id);
     }
 
     @AllArgsConstructor
-    private static class Request implements RequestDTO {
+    private static class TeacherCommentRequest implements RequestDTO {
         public long userId, teacherId;
         public String comment;
 

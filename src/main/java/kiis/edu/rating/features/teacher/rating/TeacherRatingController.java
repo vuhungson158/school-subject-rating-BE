@@ -4,9 +4,10 @@ import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.rating.SubjectRatingEntity;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.features.user.UserRole;
+import kiis.edu.rating.features.user.UserRole.TeacherRating;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -58,8 +59,9 @@ public class TeacherRatingController {
         return teacherRatingAverageRepository.findTeacherRatingAverageByTeacherId(teacherId);
     }
     @PostMapping("")
-    @PreAuthorize("hasAuthority('TEACHER_RATING_CREATE')")
-    public void create(@RequestBody @Valid Request request) {
+    public void create(@RequestBody @Valid TeacherRatingController.TeacherRatingRequest request) {
+        UserRole.requirePermission(TeacherRating.CREATE);
+
         long teacherId = request.teacherId;
         long userId = request.userId;
 
@@ -73,8 +75,9 @@ public class TeacherRatingController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('TEACHER_RATING_UPDATE')")
-    public void update(@PathVariable long id, @RequestBody @Valid Request request) {
+    public void update(@PathVariable long id, @RequestBody @Valid TeacherRatingController.TeacherRatingRequest request) {
+        UserRole.requirePermission(TeacherRating.UPDATE);
+
         if (!teacherRatingRepository.existsById(id))
             throw new IllegalArgumentException("No Rating with Id: " + id);
         TeacherRatingEntity ratingEntity = request.toEntity();
@@ -83,13 +86,14 @@ public class TeacherRatingController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('TEACHER_RATING_DELETE')")
     public void delete(@PathVariable long id) {
+        UserRole.requirePermission(TeacherRating.DELETE);
+
         teacherRatingRepository.deleteById(id);
     }
 
     @AllArgsConstructor
-    private static class Request implements RequestDTO {
+    private static class TeacherRatingRequest implements RequestDTO {
         public long userId, teacherId;
         @Min(value = 0, message = "Min = 0")
         @Max(value = 100, message = "Max = 100")
@@ -113,31 +117,6 @@ public class TeacherRatingController {
         @Override
         public TeacherRatingEntity toEntity() {
             return Util.mapping(this, TeacherRatingEntity.class);
-        }
-    }
-
-
-    @AllArgsConstructor
-    private static class SubjectRatingRequest implements RequestDTO {
-        public long userId, subjectId;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int practicality;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int difficult;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int homework;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int testDifficult;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int teacherPedagogical;
-
-        public SubjectRatingEntity toEntity() {
-            return Util.mapping(this, SubjectRatingEntity.class);
         }
     }
 }

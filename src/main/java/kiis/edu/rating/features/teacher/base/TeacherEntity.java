@@ -2,8 +2,8 @@ package kiis.edu.rating.features.teacher.base;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import kiis.edu.rating.features.common.BaseEntity;
-import kiis.edu.rating.features.common.enums.Gender;
-import kiis.edu.rating.features.common.enums.PostgreSQLEnumType;
+import kiis.edu.rating.enums.Gender;
+import kiis.edu.rating.enums.PostgreSQLEnumType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;

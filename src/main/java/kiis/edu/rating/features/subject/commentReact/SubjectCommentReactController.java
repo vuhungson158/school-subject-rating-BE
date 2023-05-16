@@ -3,9 +3,10 @@ package kiis.edu.rating.features.subject.commentReact;
 import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.comment.SubjectCommentRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.features.user.UserRole;
+import kiis.edu.rating.features.user.UserRole.SubjectCommentReact;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,17 +32,18 @@ public class SubjectCommentReactController {
             throw new IllegalArgumentException("No Comment with Id: " + commentId);
         return subjectCommentReactRepository.findByCommentId(commentId);
     }
-    @GetMapping("/userId/{userId}/list/{list}")
+    @GetMapping("/my")
     public List<SubjectCommentReactEntity> getByUserIdAndCommentIdList(
-            @PathVariable("userId") long userId, @PathVariable("list") List<Long> list) {
+            @RequestParam long userId, @RequestParam List<Long> idList) {
         if (!userRepository.existsById(userId))
             throw new IllegalArgumentException("No User with Id: " + userId);
-        return subjectCommentReactRepository.findByUserIdAndCommentIdList(userId, list);
+        return subjectCommentReactRepository.findByUserIdAndCommentIdList(userId, idList);
     }
 
     @PostMapping("")
-    @PreAuthorize("hasAuthority('COMMENT_REACT_CREATE')")
-    public void create(@RequestBody Request request) {
+    public void create(@RequestBody SubjectCommentReactRequest request) {
+        UserRole.requirePermission(SubjectCommentReact.CREATE);
+
         if (!subjectCommentRepository.existsById(request.commentId))
             throw new IllegalArgumentException("No Comment with Id: " + request.commentId);
         if (!userRepository.existsById(request.userId))
@@ -52,8 +54,9 @@ public class SubjectCommentReactController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_REACT_UPDATE')")
-    public void update(@PathVariable long id, @RequestBody Request request) {
+    public void update(@PathVariable long id, @RequestBody SubjectCommentReactRequest request) {
+        UserRole.requirePermission(SubjectCommentReact.UPDATE);
+
         if (!subjectCommentReactRepository.existsById(id))
             throw new IllegalArgumentException("No comment React with id : " + id);
         SubjectCommentReactEntity subjectCommentReactEntity = request.toEntity();
@@ -62,13 +65,14 @@ public class SubjectCommentReactController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('COMMENT_REACT_DELETE')")
     public void deleteRating(@PathVariable long id) {
+        UserRole.requirePermission(SubjectCommentReact.DELETE);
+
         subjectCommentReactRepository.deleteById(id);
     }
 
     @AllArgsConstructor
-    private static class Request implements RequestDTO {
+    private static class SubjectCommentReactRequest implements RequestDTO {
         public long userId, commentId;
         public boolean react;
 

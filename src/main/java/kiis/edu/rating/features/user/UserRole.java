@@ -73,10 +73,6 @@ public enum UserRole {
         return permissions;
     }
 
-    public Set<String> getPermissions() {
-        return permissions;
-    }
-
     public static void requirePermission(Permission permission) {
         String permissionName = permission.getName();
         Collection<? extends GrantedAuthority> authorities =
@@ -94,7 +90,7 @@ public enum UserRole {
     //----------------------------------------------------------------------------------------
 
     public enum Subject implements Permission {
-        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE;
+        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE, DISABLE;
 
         @Override
         public String getName() {
@@ -103,7 +99,7 @@ public enum UserRole {
     }
 
     public enum SubjectRating implements Permission {
-        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE;
+        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE, DISABLE;
 
         @Override
         public String getName() {
@@ -112,7 +108,7 @@ public enum UserRole {
     }
 
     public enum SubjectComment implements Permission {
-        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE;
+        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE, DISABLE;
 
         @Override
         public String getName() {
@@ -121,7 +117,7 @@ public enum UserRole {
     }
 
     public enum SubjectCommentReact implements Permission {
-        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE;
+        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE, DISABLE;
 
         @Override
         public String getName() {
@@ -130,7 +126,7 @@ public enum UserRole {
     }
 
     public enum Teacher implements Permission {
-        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE;
+        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE, DISABLE;
 
         @Override
         public String getName() {
@@ -139,7 +135,7 @@ public enum UserRole {
     }
 
     public enum TeacherRating implements Permission {
-        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE;
+        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE, DISABLE;
 
         @Override
         public String getName() {
@@ -148,7 +144,7 @@ public enum UserRole {
     }
 
     public enum TeacherComment implements Permission {
-        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE;
+        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE, DISABLE;
 
         @Override
         public String getName() {
@@ -157,7 +153,7 @@ public enum UserRole {
     }
 
     public enum TeacherCommentReact implements Permission {
-        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE;
+        GET_BY_ID, GET_ALL, CREATE, UPDATE, DELETE, DISABLE;
 
         @Override
         public String getName() {

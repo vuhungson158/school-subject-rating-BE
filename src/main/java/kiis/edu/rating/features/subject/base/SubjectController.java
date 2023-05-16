@@ -1,9 +1,8 @@
 package kiis.edu.rating.features.subject.base;
 
+import kiis.edu.rating.enums.Department;
 import kiis.edu.rating.features.common.RequestDTO;
-import kiis.edu.rating.features.common.enums.Specialize;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
-import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.features.user.UserRole;
 import kiis.edu.rating.features.user.UserRole.Subject;
 import kiis.edu.rating.helper.Util;
@@ -21,7 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping(path = "/subject")
 public class SubjectController {
-    private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
 
@@ -32,8 +30,15 @@ public class SubjectController {
     }
 
     @GetMapping("")
-    public List<SubjectEntity> getAll() {
+    public List<SubjectEntity> getAllEnable() {
         return subjectRepository.findAllByDisable(false);
+    }
+
+    @GetMapping("/all")
+    public List<SubjectEntity> getAll() {
+        UserRole.requirePermission(Subject.GET_ALL);
+
+        return subjectRepository.findAll();
     }
 
     @PostMapping("")
@@ -77,7 +82,7 @@ public class SubjectController {
         @Max(value = 4, message = "Max = 4")
         public int formYear;
         public String name;
-        public Specialize specialize;
+        public Department specialize;
 
         public SubjectEntity toEntity() {
             return Util.mapping(this, SubjectEntity.class);

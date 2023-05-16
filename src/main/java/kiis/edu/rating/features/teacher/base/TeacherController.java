@@ -1,9 +1,11 @@
 package kiis.edu.rating.features.teacher.base;
 
 import kiis.edu.rating.features.common.RequestDTO;
-import kiis.edu.rating.features.common.enums.Gender;
+import kiis.edu.rating.enums.Gender;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
+import kiis.edu.rating.features.user.UserRole;
+import kiis.edu.rating.features.user.UserRole.Teacher;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,19 +30,28 @@ public class TeacherController {
     }
 
     @GetMapping("")
-    public List<TeacherEntity> getAll() {
+    public List<TeacherEntity> getAllEnable() {
         return teacherRepository.findAllByDisable(false);
     }
 
+    @GetMapping("/all")
+    public List<TeacherEntity> getAll() {
+        UserRole.requirePermission(Teacher.GET_ALL);
+
+        return teacherRepository.findAll();
+    }
+
     @PostMapping("")
-    @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
     public void create(@RequestBody TeacherRequest request) {
+        UserRole.requirePermission(Teacher.CREATE);
+
         teacherRepository.save(request.toEntity());
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('TEACHER_UPDATE')")
     public void update(@PathVariable long id, @RequestBody TeacherRequest request) {
+        UserRole.requirePermission(Teacher.UPDATE);
+
         if (!teacherRepository.existsById(id))
             throw new IllegalArgumentException("No Teacher with ID:" + id);
         TeacherEntity teacherEntity = request.toEntity();
@@ -49,8 +60,9 @@ public class TeacherController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('TEACHER_DELETE')")
     public void delete(@PathVariable long id) {
+        UserRole.requirePermission(Teacher.DELETE);
+
         TeacherEntity teacherEntity = teacherRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No Teacher with Id: " + id));
         subjectRepository.updateDisableSubjectByTeacherId(id, true);
@@ -62,7 +74,7 @@ public class TeacherController {
     private static class TeacherRequest implements RequestDTO {
         public String name, nationality;
         public Gender gender;
-//        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
+        // @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
         public Date dob;
 
         @Override

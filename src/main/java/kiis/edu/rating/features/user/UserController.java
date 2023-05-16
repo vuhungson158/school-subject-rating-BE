@@ -2,7 +2,7 @@ package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
 import kiis.edu.rating.features.common.BaseEntity;
-import kiis.edu.rating.features.common.enums.Gender;
+import kiis.edu.rating.enums.Gender;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package kiis.edu.rating.features.common.enums;
+package kiis.edu.rating.enums;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;

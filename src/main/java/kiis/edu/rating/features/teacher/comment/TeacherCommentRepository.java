@@ -21,7 +21,7 @@ interface TeacherCommentWithLikeCountRepository extends JpaRepository<TeacherCom
             "select comment.*, count(if(react=1,1,null)) as like_count, count(if(react=0,1,null)) as dislike_count from "
                     + "( "
                     + "select * from comment "
-                    + "where and ref_id = :id "
+                    + "where and ref_id = :teacherId "
                     + ") "
                     + "as comment "
                     + "left join comment_rating "
@@ -30,6 +30,6 @@ interface TeacherCommentWithLikeCountRepository extends JpaRepository<TeacherCom
                     + "order by count(*) desc limit :page, :limit "
     )
     List<TeacherCommentWithLikeCount> findTopRatingComment(
-            @Param("limit") int limit, @Param("page") int page, @Param("id") long id
+            @Param("limit") int limit, @Param("page") int page, @Param("teacherId") long teacherId
     );
 }

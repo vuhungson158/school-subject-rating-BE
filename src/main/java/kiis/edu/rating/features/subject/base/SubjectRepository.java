@@ -17,6 +17,13 @@ public interface SubjectRepository extends JpaRepository<SubjectEntity, Long> {
     @Modifying
     @Query(value = "UPDATE subject SET disable = :disable WHERE teacher_id = :teacherId", nativeQuery = true)
     void updateDisableSubjectByTeacherId(@Param("teacherId") long teacherId, @Param("disable") boolean disable);
+
+    @Query(nativeQuery = true, value =
+            "select id"
+                    + " \n from subject"
+                    + " \n where id in (:idList)"
+    )
+    List<Long> existsByIdList(@Param("idList") List<Long> idList);
 }
 
 
