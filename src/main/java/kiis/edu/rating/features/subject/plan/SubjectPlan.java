@@ -1,4 +1,4 @@
-package kiis.edu.rating.features.subject.registration.plan;
+package kiis.edu.rating.features.subject.plan;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kiis.edu.rating.features.common.BaseEntity;
@@ -11,10 +11,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "subject_registration_plan")
+@Table(name = "subject_plan")
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubjectRegistrationPlan extends BaseEntity {
+public class SubjectPlan extends BaseEntity {
 
     public long userId;
 

@@ -15,9 +15,9 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
-  data:
-    rest:
-      base-path: /api/v1
+server:
+  servlet:
+    context-path: /api/v1
 logging:
   level:
     web: debug

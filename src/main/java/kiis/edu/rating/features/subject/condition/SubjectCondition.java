@@ -1,4 +1,4 @@
-package kiis.edu.rating.features.subject.registration.condition;
+package kiis.edu.rating.features.subject.condition;
 
 import kiis.edu.rating.features.common.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -6,11 +6,12 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Set;
 
 @Entity
-@Table(name = "subject_registration_condition")
+@Table(name = "subject_condition")
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubjectRegistrationCondition extends BaseEntity {
-    public int fromId, toId;
+public class SubjectCondition extends BaseEntity {
+    public long fromId, toId;
 }

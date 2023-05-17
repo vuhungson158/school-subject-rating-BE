@@ -1,4 +1,4 @@
-package kiis.edu.rating.features.subject.registration.plan;
+package kiis.edu.rating.features.subject.plan;
 
 import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
@@ -13,52 +13,52 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/subject-registration-plan")
-public class SubjectRegistrationPlanController {
-    private final SubjectRegistrationPlanRepository subjectRegistrationPlanRepository;
+@RequestMapping(path = "/subject-plan")
+public class SubjectPlanController {
+    private final SubjectPlanRepository subjectPlanRepository;
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
 
     @GetMapping("/{id}")
-    public SubjectRegistrationPlan getById(@PathVariable long id) {
-        return subjectRegistrationPlanRepository.findById(id)
+    public SubjectPlan getById(@PathVariable long id) {
+        return subjectPlanRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No Rating with id : " + id));
     }
 
     @GetMapping("")
-    public List<SubjectRegistrationPlan> getAll() {
-        return subjectRegistrationPlanRepository.findAll();
+    public List<SubjectPlan> getAll() {
+        return subjectPlanRepository.findAll();
     }
 
     @PostMapping("")
-    public void create(@RequestBody @Valid SubjectRegistrationPlanRequest request) {
+    public void create(@RequestBody @Valid SubjectPlanRequest request) {
         validateRequest(request);
 
-        if (subjectRegistrationPlanRepository.existsByUserId(request.userId))
+        if (subjectPlanRepository.existsByUserId(request.userId))
             throw new IllegalArgumentException("Existed, please use Update Method");
 
-        subjectRegistrationPlanRepository.save(request.toEntity());
+        subjectPlanRepository.save(request.toEntity());
     }
 
     @PutMapping("/{id}")
-    public void update(@PathVariable long id, @RequestBody @Valid SubjectRegistrationPlanRequest request) {
+    public void update(@PathVariable long id, @RequestBody @Valid SubjectPlanRequest request) {
         validateRequest(request);
 
-        SubjectRegistrationPlan subjectRatingEntity = request.toEntity();
+        SubjectPlan subjectRatingEntity = request.toEntity();
         subjectRatingEntity.id = id;
-        subjectRegistrationPlanRepository.save(subjectRatingEntity);
+        subjectPlanRepository.save(subjectRatingEntity);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        subjectRegistrationPlanRepository.deleteById(id);
+        subjectPlanRepository.deleteById(id);
     }
 
     //------------------------------------------------------------------------------------------------
     // private
     //------------------------------------------------------------------------------------------------
 
-    private void validateRequest(SubjectRegistrationPlanRequest request){
+    private void validateRequest(SubjectPlanRequest request){
         List<Long> idList = request.subjectIdList;
 
         if (!userRepository.existsById(request.userId))
@@ -71,12 +71,12 @@ public class SubjectRegistrationPlanController {
     }
 
     @AllArgsConstructor
-    private static class SubjectRegistrationPlanRequest implements RequestDTO {
+    private static class SubjectPlanRequest implements RequestDTO {
         public long userId;
         public List<Long> subjectIdList;
 
-        public SubjectRegistrationPlan toEntity() {
-            SubjectRegistrationPlan entity = new SubjectRegistrationPlan();
+        public SubjectPlan toEntity() {
+            SubjectPlan entity = new SubjectPlan();
             entity.userId = this.userId;
             entity.subjectIds = this.subjectIdList.stream().map(String::valueOf)
                     .collect(Collectors.joining("_"));;
