@@ -1,8 +1,9 @@
 package kiis.edu.rating.features.user;
 
 import io.jsonwebtoken.Jwts;
-import kiis.edu.rating.features.common.BaseEntity;
 import kiis.edu.rating.enums.Gender;
+import kiis.edu.rating.exception.LoginException;
+import kiis.edu.rating.features.common.BaseEntity;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -26,9 +27,10 @@ public class UserController {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-        UserEntity userEntity =
-                userRepository.findByEmailAndPassword(loginRequest.username, loginRequest.password)
-                        .orElseThrow(() -> new IllegalArgumentException("Email or Password is incorrect"));
+        UserEntity userEntity = userRepository.findByEmail(loginRequest.email)
+                .orElseThrow(() -> new LoginException("Email is not correct"));
+        if (!userEntity.password.equals(loginRequest.password))
+            throw new LoginException("Password is not correct");
 
         String token = Jwts.builder()
                 .setSubject(userEntity.email)
@@ -87,7 +89,7 @@ public class UserController {
 
     @AllArgsConstructor
     private static class LoginRequest {
-        public final String username, password;
+        public final String email, password;
     }
 
     @AllArgsConstructor
