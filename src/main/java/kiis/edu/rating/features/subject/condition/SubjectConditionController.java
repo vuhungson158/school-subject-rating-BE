@@ -1,13 +1,13 @@
 package kiis.edu.rating.features.subject.condition;
 
 import kiis.edu.rating.exception.RecordNotFoundException;
-import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +21,7 @@ public class SubjectConditionController {
     private final SubjectRepository subjectRepository;
 
     @GetMapping("/{id}")
-    public SubjectCondition getById(@PathVariable long id) {
+    public SubjectConditionEntity getById(@PathVariable long id) {
         return subjectConditionRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Condition", id));
     }
@@ -42,7 +42,7 @@ public class SubjectConditionController {
     public void update(@PathVariable long id, @RequestBody @Valid SubjectConditionRequest request) {
         validateRequest(request);
 
-        SubjectCondition subjectRatingEntity = request.toEntity();
+        SubjectConditionEntity subjectRatingEntity = request.toEntity();
         subjectRatingEntity.id = id;
         subjectConditionRepository.save(subjectRatingEntity);
     }
@@ -68,20 +68,21 @@ public class SubjectConditionController {
 
     }
 
-    @AllArgsConstructor
-    private static class SubjectConditionRequest implements RequestDTO {
-        public Long fromId, toId;
+    private static class SubjectConditionRequest extends SubjectConditionEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
 
-        public SubjectCondition toEntity() {
-            return Util.mapping(this, SubjectCondition.class);
+        public SubjectConditionEntity toEntity() {
+            return Util.mapping(this, SubjectConditionEntity.class);
         }
     }
 
     private static class ConditionGraph {
-        public List<SubjectCondition> subjectConditionList;
+        public List<SubjectConditionEntity> subjectConditionList;
         public Set<Long> subjectIds;
 
-        public ConditionGraph(List<SubjectCondition> subjectConditionList) {
+        public ConditionGraph(List<SubjectConditionEntity> subjectConditionList) {
             this.subjectConditionList = subjectConditionList;
             Set<Long> subjectIdSet = new HashSet<>();
             subjectConditionList.forEach(condition ->{

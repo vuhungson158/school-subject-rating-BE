@@ -1,7 +1,5 @@
 package kiis.edu.rating.features.teacher.rating;
 
-import kiis.edu.rating.features.common.RequestDTO;
-import kiis.edu.rating.features.subject.rating.SubjectRatingEntity;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.features.user.UserRole;
@@ -11,8 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import java.time.Instant;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -92,29 +89,11 @@ public class TeacherRatingController {
         teacherRatingRepository.deleteById(id);
     }
 
-    @AllArgsConstructor
-    private static class TeacherRatingRequest implements RequestDTO {
-        public long userId, teacherId;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int enthusiasm;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int friendly;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int nonConservatism;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int erudition;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int pedagogicalLevel;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 10, message = "Max = 10")
-        public int star;
+    private static class TeacherRatingRequest extends TeacherRatingEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
 
-        @Override
         public TeacherRatingEntity toEntity() {
             return Util.mapping(this, TeacherRatingEntity.class);
         }

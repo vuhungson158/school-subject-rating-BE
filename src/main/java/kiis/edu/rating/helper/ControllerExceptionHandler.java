@@ -4,8 +4,12 @@ import kiis.edu.rating.features.common.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
 
 @SuppressWarnings("unused")
 @RestControllerAdvice
@@ -24,6 +28,17 @@ public class ControllerExceptionHandler {
         }
         if (exception instanceof BadCredentialsException) {
             status = HttpStatus.UNAUTHORIZED;
+        }
+        if (exception instanceof MethodArgumentNotValidException) {
+            List<FieldError> allErrors = ((MethodArgumentNotValidException) exception).getBindingResult().getFieldErrors();
+            StringBuilder sb = new StringBuilder();
+            for (FieldError error : allErrors) {
+                sb.append("Field: [").append(error.getField()).append("] ")
+                        .append(error.getDefaultMessage())
+                        .append(", rejected value: ").append(error.getRejectedValue()).append(". ");
+            }
+            status = HttpStatus.BAD_REQUEST;
+            message = sb.toString();
         }
         return new BaseResponse<>(status, message, exception.getClass().getName());
     }

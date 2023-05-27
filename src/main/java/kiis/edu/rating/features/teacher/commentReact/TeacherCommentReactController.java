@@ -1,6 +1,5 @@
 package kiis.edu.rating.features.teacher.commentReact;
 
-import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.teacher.comment.TeacherCommentRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.features.user.UserRole;
@@ -9,6 +8,7 @@ import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -64,10 +64,10 @@ public class TeacherCommentReactController {
         teacherCommentReactRepository.deleteById(id);
     }
 
-    @AllArgsConstructor
-    private static class TeacherCommentReactRequest implements RequestDTO {
-        public long userId, commentId;
-        public boolean react;
+    private static class TeacherCommentReactRequest extends TeacherCommentReactEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
 
         public TeacherCommentReactEntity toEntity() {
             return Util.mapping(this, TeacherCommentReactEntity.class);

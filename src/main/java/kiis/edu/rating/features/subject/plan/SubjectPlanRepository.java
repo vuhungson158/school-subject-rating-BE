@@ -1,6 +1,6 @@
 package kiis.edu.rating.features.subject.plan;
 
-import kiis.edu.rating.features.subject.condition.SubjectCondition;
+import kiis.edu.rating.features.subject.condition.SubjectConditionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,9 +9,9 @@ import java.util.List;
 
 @Transactional
 @Repository
-public interface SubjectPlanRepository extends JpaRepository<SubjectPlan, Long> {
+public interface SubjectPlanRepository extends JpaRepository<SubjectPlanEntity, Long> {
 
-    List<SubjectCondition> findAllByDisable(boolean disable);
+    List<SubjectConditionEntity> findAllByDisable(boolean disable);
 
     boolean existsByUserId(long userId);
 }

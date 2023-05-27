@@ -1,6 +1,5 @@
 package kiis.edu.rating.features.subject.comment;
 
-import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.features.user.UserRole;
@@ -10,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -87,12 +87,11 @@ public class SubjectCommentController {
         subjectCommentRepository.deleteById(id);
     }
 
-    @AllArgsConstructor
-    private static class SubjectCommentRequest implements RequestDTO {
-        public long userId, subjectId;
-        public String comment;
+    private static class SubjectCommentRequest extends SubjectCommentEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
 
-        @Override
         public SubjectCommentEntity toEntity() {
             return Util.mapping(this, SubjectCommentEntity.class);
         }

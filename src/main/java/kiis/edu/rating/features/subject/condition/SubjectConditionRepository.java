@@ -8,9 +8,9 @@ import java.util.List;
 
 @Transactional
 @Repository
-public interface SubjectConditionRepository extends JpaRepository<SubjectCondition, Long> {
+public interface SubjectConditionRepository extends JpaRepository<SubjectConditionEntity, Long> {
 
-    List<SubjectCondition> findAllByDisable(boolean disable);
+    List<SubjectConditionEntity> findAllByDisable(boolean disable);
 }
 
 

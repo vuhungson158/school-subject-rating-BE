@@ -1,6 +1,5 @@
 package kiis.edu.rating.features.subject.rating;
 
-import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.features.user.UserRole;
@@ -10,8 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import java.time.Instant;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -95,27 +93,10 @@ public class SubjectRatingController {
         subjectRatingRepository.deleteById(id);
     }
 
-    @AllArgsConstructor
-    private static class SubjectRatingRequest implements RequestDTO {
-        public long userId, subjectId;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int practicality;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int difficult;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int homework;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int testDifficult;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 100, message = "Max = 100")
-        public int teacherPedagogical;
-        @Min(value = 0, message = "Min = 0")
-        @Max(value = 10, message = "Max = 10")
-        public int star;
+    private static class SubjectRatingRequest extends SubjectRatingEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
 
         public SubjectRatingEntity toEntity() {
             return Util.mapping(this, SubjectRatingEntity.class);

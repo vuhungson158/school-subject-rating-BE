@@ -1,17 +1,14 @@
 package kiis.edu.rating.features.teacher.base;
 
-import kiis.edu.rating.features.common.RequestDTO;
-import kiis.edu.rating.enums.Gender;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.features.user.UserRole;
 import kiis.edu.rating.features.user.UserRole.Teacher;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -71,13 +68,11 @@ public class TeacherController {
     }
 
     @AllArgsConstructor
-    private static class TeacherRequest implements RequestDTO {
-        public String name, nationality;
-        public Gender gender;
-        // @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
-        public Date dob;
+    private static class TeacherRequest extends TeacherEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
 
-        @Override
         public TeacherEntity toEntity() {
             return Util.mapping(this, TeacherEntity.class);
         }

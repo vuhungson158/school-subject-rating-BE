@@ -1,12 +1,14 @@
 package kiis.edu.rating.features.subject.plan;
 
-import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
+import kiis.edu.rating.features.subject.condition.SubjectConditionRepository;
+import kiis.edu.rating.features.subject.plan.SubjectPlanGroup.DepartmentGroup;
 import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,16 +20,25 @@ public class SubjectPlanController {
     private final SubjectPlanRepository subjectPlanRepository;
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
+    private final SubjectConditionRepository subjectConditionRepository;
 
     @GetMapping("/{id}")
-    public SubjectPlan getById(@PathVariable long id) {
+    public SubjectPlanEntity getById(@PathVariable long id) {
         return subjectPlanRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No Rating with id : " + id));
     }
 
     @GetMapping("")
-    public List<SubjectPlan> getAll() {
+    public List<SubjectPlanEntity> getAll() {
         return subjectPlanRepository.findAll();
+    }
+
+    @GetMapping("/group")
+    public List<DepartmentGroup> getAllByGroup() {
+
+        return SubjectPlanGroup.grouping(
+                subjectRepository.findAllByDisable(false),
+                subjectConditionRepository.findAllByDisable(false));
     }
 
     @PostMapping("")
@@ -44,7 +55,7 @@ public class SubjectPlanController {
     public void update(@PathVariable long id, @RequestBody @Valid SubjectPlanRequest request) {
         validateRequest(request);
 
-        SubjectPlan subjectRatingEntity = request.toEntity();
+        SubjectPlanEntity subjectRatingEntity = request.toEntity();
         subjectRatingEntity.id = id;
         subjectPlanRepository.save(subjectRatingEntity);
     }
@@ -58,7 +69,7 @@ public class SubjectPlanController {
     // private
     //------------------------------------------------------------------------------------------------
 
-    private void validateRequest(SubjectPlanRequest request){
+    private void validateRequest(SubjectPlanRequest request) {
         List<Long> idList = request.subjectIdList;
 
         if (!userRepository.existsById(request.userId))
@@ -70,16 +81,18 @@ public class SubjectPlanController {
             throw new IllegalArgumentException("Some Subject are not exist, ID: " + idList);
     }
 
-    @AllArgsConstructor
-    private static class SubjectPlanRequest implements RequestDTO {
-        public long userId;
+    private static class SubjectPlanRequest extends SubjectPlanEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
+
         public List<Long> subjectIdList;
 
-        public SubjectPlan toEntity() {
-            SubjectPlan entity = new SubjectPlan();
+        public SubjectPlanEntity toEntity() {
+            SubjectPlanEntity entity = new SubjectPlanEntity();
             entity.userId = this.userId;
             entity.subjectIds = this.subjectIdList.stream().map(String::valueOf)
-                    .collect(Collectors.joining("_"));;
+                    .collect(Collectors.joining("_"));
             return entity;
         }
     }

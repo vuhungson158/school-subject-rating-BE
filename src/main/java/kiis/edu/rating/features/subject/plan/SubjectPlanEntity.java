@@ -5,7 +5,9 @@ import kiis.edu.rating.features.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,7 +16,7 @@ import java.util.stream.Collectors;
 @Table(name = "subject_plan")
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubjectPlan extends BaseEntity {
+public class SubjectPlanEntity extends BaseEntity {
 
     public long userId;
 
@@ -22,6 +24,7 @@ public class SubjectPlan extends BaseEntity {
     public String subjectIds;
 
     @Transient
+    @SuppressWarnings("unused")
     public Set<Integer> getSubjectIdList() {
         return Arrays.stream(subjectIds.split("_"))
                 .mapToInt(Integer::parseInt).boxed().collect(Collectors.toSet());

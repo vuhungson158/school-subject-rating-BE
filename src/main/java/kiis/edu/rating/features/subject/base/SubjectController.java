@@ -1,18 +1,14 @@
 package kiis.edu.rating.features.subject.base;
 
-import kiis.edu.rating.enums.Department;
-import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.features.user.UserRole;
 import kiis.edu.rating.features.user.UserRole.Subject;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import java.time.Instant;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -71,18 +67,10 @@ public class SubjectController {
         subjectRepository.save(subjectEntity);
     }
 
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class SubjectRequest implements RequestDTO {
-        public long teacherId;
-        @Min(value = 1, message = "Min = 1")
-        @Max(value = 6, message = "Max = 6")
-        public int unit;
-        @Min(value = 1, message = "Min = 1")
-        @Max(value = 4, message = "Max = 4")
-        public int formYear;
-        public String name;
-        public Department specialize;
+    private static class SubjectRequest extends SubjectEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
 
         public SubjectEntity toEntity() {
             return Util.mapping(this, SubjectEntity.class);

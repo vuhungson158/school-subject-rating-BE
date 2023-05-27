@@ -6,6 +6,9 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
     hibernate:
       ddl-auto: none
     open-in-view: true
@@ -20,4 +23,11 @@ server:
     context-path: /api/v1
 logging:
   level:
+    org:
+      hibernate:
+        type: trace
     web: debug
+#    sql: trace
+
+#    logging.level.org.hibernate.SQL=DEBUG
+#    logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE

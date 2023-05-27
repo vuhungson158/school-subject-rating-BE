@@ -1,6 +1,5 @@
 package kiis.edu.rating.features.teacher.comment;
 
-import kiis.edu.rating.features.common.RequestDTO;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.features.user.UserRole;
@@ -10,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -75,12 +75,11 @@ public class TeacherCommentController {
         teacherCommentRepository.deleteById(id);
     }
 
-    @AllArgsConstructor
-    private static class TeacherCommentRequest implements RequestDTO {
-        public long userId, teacherId;
-        public String comment;
+    private static class TeacherCommentRequest extends TeacherCommentEntity {
+        private long id;
+        private Instant createdAt, updatedAt;
+        private boolean disable;
 
-        @Override
         public TeacherCommentEntity toEntity() {
             return Util.mapping(this, TeacherCommentEntity.class);
         }
