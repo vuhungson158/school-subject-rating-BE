@@ -11,133 +11,169 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static kiis.edu.rating.enums.Department.ALL;
-import static kiis.edu.rating.enums.Department.values;
 import static kiis.edu.rating.enums.SubjectClassification.*;
 
-@AllArgsConstructor
 public class SubjectPlanGroup {
+    private final List<SubjectEntity> subjectEntityList;
+    private final List<SubjectConditionEntity> conditionList;
 
-    public static List<DepartmentGroup> grouping
-            (List<SubjectEntity> subjectEntityList,
-             List<SubjectConditionEntity> conditionList) {
+    private Department currentDepartment;
+    private Big currentBig;
+    private Middle currentMiddle;
 
-        final List<DepartmentGroup> result = new ArrayList<>();
-        for (Department department : values()) {
+    public SubjectPlanGroup(List<SubjectEntity> subjectEntityList,
+                            List<SubjectConditionEntity> conditionList) {
+        this.subjectEntityList = subjectEntityList;
+        this.conditionList = conditionList;
+    }
+
+    public List<DepartmentGroup> createList() {
+        final List<DepartmentGroup> departmentGroupList = new ArrayList<>();
+        for (Department department : Department.values()) {
+            currentDepartment = department;
+
             if (department.equals(ALL)) continue;
-            final List<SubjectEntity> subjectsByDepartment = filter(subjectEntityList,
+            final List<SubjectEntity> filteredByDepartment = filter(this.subjectEntityList,
                     subject -> subject.department.equals(department)
                             || subject.department.equals(ALL));
-            final List<BigGroup> bigGroupList = new ArrayList<>();
-            for (Big big : Big.values()) {
-                final List<SubjectEntity> subjectsByBig = filter(subjectsByDepartment,
-                        subject -> subject.classification.getMiddle().getBig().equals(big));
-                final List<MiddleGroup> middleGroupList = new ArrayList<>();
-                int bigRowspan = 0;
-                for (Middle middle : Middle.values()) {
-                    if (!middle.getBig().equals(big)) continue;
-                    final List<SubjectEntity> subjectsByMiddle = filter(subjectsByBig,
-                            subject -> subject.classification.getMiddle().equals(middle));
-                    final List<SmallGroup> smallGroupList = new ArrayList<>();
-                    int middleRowspan = 0;
-                    for (Small small : Small.values()) {
-                        if (!small.getMiddle().equals(middle)) continue;
-                        if (!small.getDepartment().equals(department)
-                                && !small.getDepartment().equals(ALL)) continue;
-                        middleRowspan++;
-                        final List<SubjectEntity> subjectsBySmall = filter(subjectsByMiddle,
-                                subject -> subject.classification.equals(small));
-                        final SmallGroup smallGroup = new SmallGroup(small, subjectsBySmall, conditionList);
-                        smallGroupList.add(smallGroup);
-                    }
-                    bigRowspan += middleRowspan;
-                    final MiddleGroup middleGroup = new MiddleGroup(middle, smallGroupList, middleRowspan);
-                    middleGroupList.add(middleGroup);
-                }
-                final BigGroup bigGroup = new BigGroup(big, middleGroupList, bigRowspan);
-                bigGroupList.add(bigGroup);
-            }
-            final DepartmentGroup departmentGroup = new DepartmentGroup(department, bigGroupList);
-            result.add(departmentGroup);
+            DepartmentGroup departmentGroup = new DepartmentGroup(department, bigList(filteredByDepartment));
+            departmentGroupList.add(departmentGroup);
         }
-        return result;
+        return departmentGroupList;
+    }
+
+
+    private List<BigGroup> bigList(List<SubjectEntity> filteredByDepartment) {
+        final List<BigGroup> bigGroupList = new ArrayList<>();
+        for (Big big : Big.values()) {
+            currentBig = big;
+
+            final List<SubjectEntity> filteredByBig = filter(filteredByDepartment,
+                    subject -> subject.classification.getMiddle().getBig().equals(big));
+            final List<MiddleGroup> middleGroupList = middleList(filteredByBig);
+            int bigRowspan = sumBigRowspan(middleGroupList);
+            final BigGroup bigGroup = new BigGroup(big, middleGroupList, bigRowspan);
+            bigGroupList.add(bigGroup);
+        }
+        return bigGroupList;
+    }
+
+    private int sumBigRowspan(List<MiddleGroup> middleList) {
+        return middleList.stream()
+                .reduce(0, (total, middle) -> total + middle.rowspan, Integer::sum);
+    }
+
+    private List<MiddleGroup> middleList(List<SubjectEntity> filteredByBig) {
+        final List<MiddleGroup> middleGroupList = new ArrayList<>();
+        for (Middle middle : Middle.values()) {
+            currentMiddle = middle;
+
+            if (!middle.getBig().equals(currentBig)) continue;
+            final List<SubjectEntity> filteredByMiddle = filter(filteredByBig,
+                    subject -> subject.classification.getMiddle().equals(middle));
+            final List<SmallGroup> smallGroupList = smallList(filteredByMiddle);
+            int middleRowspan = countMiddleRowspan(smallGroupList);
+            final MiddleGroup middleGroup = new MiddleGroup(middle, smallGroupList, middleRowspan);
+            middleGroupList.add(middleGroup);
+        }
+        return middleGroupList;
+    }
+
+    private int countMiddleRowspan(List<SmallGroup> smallList) {
+        return smallList.size();
+    }
+
+    private List<SmallGroup> smallList(List<SubjectEntity> filteredByMiddle) {
+        final List<SmallGroup> smallGroupList = new ArrayList<>();
+
+        for (Small small : Small.values()) {
+            if (!small.getMiddle().equals(currentMiddle)) continue;
+            if (!small.getDepartment().equals(currentDepartment)
+                    && !small.getDepartment().equals(ALL)) continue;
+            final List<SubjectEntity> filteredBySmall = filter(filteredByMiddle,
+                    subject -> subject.classification.equals(small));
+            final SmallGroup smallGroup = new SmallGroup(small, filteredBySmall, conditionList);
+            smallGroupList.add(smallGroup);
+        }
+        return smallGroupList;
     }
 
     private static List<SubjectEntity> filter(List<SubjectEntity> subjectEntityList, Predicate<SubjectEntity> predicate) {
         return subjectEntityList.stream().filter(predicate).collect(Collectors.toList());
     }
+}
 
-    public static class DepartmentGroup extends Group<Department> {
-        public final List<BigGroup> bigList;
+class DepartmentGroup extends Group<Department> {
+    public final List<BigGroup> bigList;
 
-        public DepartmentGroup(Department department, List<BigGroup> bigList) {
-            super(department, department.getLabel());
-            this.bigList = bigList;
-        }
+    public DepartmentGroup(Department department, List<BigGroup> bigList) {
+        super(department, department.getLabel());
+        this.bigList = bigList;
     }
+}
 
-    public static class BigGroup extends Group<Big> {
-        public final List<MiddleGroup> middleList;
-        public final int creditNeeded;
-        public final int rowspan;
+class BigGroup extends Group<Big> {
+    public final List<MiddleGroup> middleList;
+    public final int creditNeeded;
+    public final int rowspan;
 
-        public BigGroup(Big big, List<MiddleGroup> middleList, int rowspan) {
-            super(big, big.getLabel());
-            this.creditNeeded = big.getCreditNeeded();
-            this.middleList = middleList;
-            this.rowspan = rowspan;
-        }
+    public BigGroup(Big big, List<MiddleGroup> middleList, int rowspan) {
+        super(big, big.getLabel());
+        this.creditNeeded = big.getCreditNeeded();
+        this.middleList = middleList;
+        this.rowspan = rowspan;
     }
+}
 
-    public static class MiddleGroup extends Group<Middle> {
-        public final List<SmallGroup> smallList;
-        public final int creditNeeded;
-        public final int rowspan;
+class MiddleGroup extends Group<Middle> {
+    public final List<SmallGroup> smallList;
+    public final int creditNeeded;
+    public final int rowspan;
 
-        public MiddleGroup(Middle middle, List<SmallGroup> smallList, int rowspan) {
-            super(middle, middle.getLabel());
-            this.creditNeeded = middle.getCreditNeeded();
-            this.smallList = smallList;
-            this.rowspan = rowspan;
-        }
+    public MiddleGroup(Middle middle, List<SmallGroup> smallList, int rowspan) {
+        super(middle, middle.getLabel());
+        this.creditNeeded = middle.getCreditNeeded();
+        this.smallList = smallList;
+        this.rowspan = rowspan;
     }
+}
 
-    public static class SmallGroup extends Group<Small> {
-        public final List<List<SubjectWithCondition>> yearList;
+class SmallGroup extends Group<Small> {
+    public final List<List<SubjectWithCondition>> yearList;
 
-        public SmallGroup(Small small, List<SubjectEntity> subjectEntityList,
-                          List<SubjectConditionEntity> conditionList) {
-            super(small, small.getLabel());
+    public SmallGroup(Small small, List<SubjectEntity> subjectEntityList,
+                      List<SubjectConditionEntity> conditionList) {
+        super(small, small.getLabel());
 
-            List<List<SubjectWithCondition>> yearList = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                final int year = i;
-                List<SubjectWithCondition> subjectListByYear = subjectEntityList.stream()
-                        .filter(subject -> subject.formYear == year)
-                        .map(subject -> new SubjectWithCondition(subject, conditionList))
-                        .collect(Collectors.toList());
-                yearList.add(subjectListByYear);
-            }
-            this.yearList = yearList;
-        }
-    }
-
-    @AllArgsConstructor
-    public static class Group<N> {
-        public final N name;
-        public final String label;
-    }
-
-    public static class SubjectWithCondition {
-        final public SubjectEntity subjectEntity;
-        final public List<Long> condition;
-
-        public SubjectWithCondition(SubjectEntity subjectEntity, List<SubjectConditionEntity> conditionList) {
-            this.subjectEntity = subjectEntity;
-            this.condition = conditionList.stream()
-                    .filter(condition -> condition.toId == subjectEntity.id)
-                    .map(condition -> condition.fromId)
+        List<List<SubjectWithCondition>> yearList = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            final int year = i;
+            List<SubjectWithCondition> subjectListByYear = subjectEntityList.stream()
+                    .filter(subject -> subject.formYear == year)
+                    .map(subject -> new SubjectWithCondition(subject, conditionList))
                     .collect(Collectors.toList());
+            yearList.add(subjectListByYear);
         }
+        this.yearList = yearList;
+    }
+}
+
+@AllArgsConstructor
+class Group<N> {
+    public final N name;
+    public final String label;
+}
+
+class SubjectWithCondition {
+    final public SubjectEntity subjectEntity;
+    final public List<Long> condition;
+
+    public SubjectWithCondition(SubjectEntity subjectEntity, List<SubjectConditionEntity> conditionList) {
+        this.subjectEntity = subjectEntity;
+        this.condition = conditionList.stream()
+                .filter(condition -> condition.toId == subjectEntity.id)
+                .map(condition -> condition.fromId)
+                .collect(Collectors.toList());
     }
 }
 

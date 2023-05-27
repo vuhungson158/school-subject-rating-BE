@@ -2,7 +2,6 @@ package kiis.edu.rating.features.subject.plan;
 
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.subject.condition.SubjectConditionRepository;
-import kiis.edu.rating.features.subject.plan.SubjectPlanGroup.DepartmentGroup;
 import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +35,12 @@ public class SubjectPlanController {
     @GetMapping("/group")
     public List<DepartmentGroup> getAllByGroup() {
 
-        return SubjectPlanGroup.grouping(
+        final SubjectPlanGroup planGroup = new SubjectPlanGroup(
                 subjectRepository.findAllByDisable(false),
-                subjectConditionRepository.findAllByDisable(false));
+                subjectConditionRepository.findAllByDisable(false)
+        );
+
+        return planGroup.createList();
     }
 
     @PostMapping("")
