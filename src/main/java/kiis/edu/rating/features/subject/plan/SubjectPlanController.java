@@ -21,6 +21,8 @@ public class SubjectPlanController {
     private final SubjectRepository subjectRepository;
     private final SubjectConditionRepository subjectConditionRepository;
 
+    private final SubjectPlanService subjectPlanService;
+
     @GetMapping("/{id}")
     public SubjectPlanEntity getById(@PathVariable long id) {
         return subjectPlanRepository.findById(id)
@@ -35,12 +37,7 @@ public class SubjectPlanController {
     @GetMapping("/group")
     public List<DepartmentGroup> getAllByGroup() {
 
-        final SubjectPlanGroup planGroup = new SubjectPlanGroup(
-                subjectRepository.findAllByDisable(false),
-                subjectConditionRepository.findAllByDisable(false)
-        );
-
-        return planGroup.createList();
+        return subjectPlanService.createList();
     }
 
     @PostMapping("")

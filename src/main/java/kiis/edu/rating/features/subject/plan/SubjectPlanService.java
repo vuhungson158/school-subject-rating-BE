@@ -2,8 +2,12 @@ package kiis.edu.rating.features.subject.plan;
 
 import kiis.edu.rating.enums.Department;
 import kiis.edu.rating.features.subject.base.SubjectEntity;
+import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.subject.condition.SubjectConditionEntity;
+import kiis.edu.rating.features.subject.condition.SubjectConditionRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,19 +17,15 @@ import java.util.stream.Collectors;
 import static kiis.edu.rating.enums.Department.ALL;
 import static kiis.edu.rating.enums.SubjectClassification.*;
 
-public class SubjectPlanGroup {
-    private final List<SubjectEntity> subjectEntityList;
-    private final List<SubjectConditionEntity> conditionList;
+@Service
+@RequiredArgsConstructor
+public class SubjectPlanService {
+    private final SubjectRepository subjectRepository;
+    private final SubjectConditionRepository subjectConditionRepository;
 
     private Department currentDepartment;
     private Big currentBig;
     private Middle currentMiddle;
-
-    public SubjectPlanGroup(List<SubjectEntity> subjectEntityList,
-                            List<SubjectConditionEntity> conditionList) {
-        this.subjectEntityList = subjectEntityList;
-        this.conditionList = conditionList;
-    }
 
     public List<DepartmentGroup> createList() {
         final List<DepartmentGroup> departmentGroupList = new ArrayList<>();
@@ -33,7 +33,7 @@ public class SubjectPlanGroup {
             currentDepartment = department;
 
             if (department.equals(ALL)) continue;
-            final List<SubjectEntity> filteredByDepartment = filter(this.subjectEntityList,
+            final List<SubjectEntity> filteredByDepartment = filter(subjectRepository.findAllByDisable(false),
                     subject -> subject.department.equals(department)
                             || subject.department.equals(ALL));
             DepartmentGroup departmentGroup = new DepartmentGroup(department, bigList(filteredByDepartment));
@@ -92,7 +92,7 @@ public class SubjectPlanGroup {
                     && !small.getDepartment().equals(ALL)) continue;
             final List<SubjectEntity> filteredBySmall = filter(filteredByMiddle,
                     subject -> subject.classification.equals(small));
-            final SmallGroup smallGroup = new SmallGroup(small, filteredBySmall, conditionList);
+            final SmallGroup smallGroup = new SmallGroup(small, filteredBySmall, subjectConditionRepository.findAllByDisable(false));
             smallGroupList.add(smallGroup);
         }
         return smallGroupList;
@@ -146,14 +146,20 @@ class SmallGroup extends Group<Small> {
         super(small, small.getLabel());
 
         List<List<SubjectWithCondition>> yearList = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 1; i <= 2; i++) {
             final int year = i;
             List<SubjectWithCondition> subjectListByYear = subjectEntityList.stream()
                     .filter(subject -> subject.formYear == year)
                     .map(subject -> new SubjectWithCondition(subject, conditionList))
                     .collect(Collectors.toList());
             yearList.add(subjectListByYear);
+
         }
+        List<SubjectWithCondition> subjectListByYear = subjectEntityList.stream()
+                .filter(subject -> subject.formYear == 3 || subject.formYear == 4)
+                .map(subject -> new SubjectWithCondition(subject, conditionList))
+                .collect(Collectors.toList());
+        yearList.add(subjectListByYear);
         this.yearList = yearList;
     }
 }
