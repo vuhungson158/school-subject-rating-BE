@@ -23,7 +23,7 @@ public interface SubjectRepository extends JpaRepository<SubjectEntity, Long> {
                     + " \n from subject"
                     + " \n where id in (:idList)"
     )
-    List<Long> existsByIdList(@Param("idList") List<Long> idList);
+    List<Long> findByIdList(@Param("idList") List<Long> idList);
 }
 
 

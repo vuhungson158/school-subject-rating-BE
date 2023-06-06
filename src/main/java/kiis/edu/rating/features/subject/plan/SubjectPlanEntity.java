@@ -2,31 +2,37 @@ package kiis.edu.rating.features.subject.plan;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kiis.edu.rating.features.common.BaseEntity;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "subject_plan")
-@AllArgsConstructor
-@NoArgsConstructor
+//@AllArgsConstructor
+@NoArgsConstructor(force = true)
+@RequiredArgsConstructor
 public class SubjectPlanEntity extends BaseEntity {
 
-    public long userId;
+    public final long userId;
+
+    private String subjectIds;
+
+    @SuppressWarnings("unused")
+    public List<Long> getSubjectIds() {
+        return Arrays.stream(subjectIds.split("_"))
+                .mapToLong(Long::parseLong).boxed().collect(Collectors.toList());
+    }
 
     @JsonIgnore
-    public String subjectIds;
-
-    @Transient
-    @SuppressWarnings("unused")
-    public Set<Integer> getSubjectIdList() {
-        return Arrays.stream(subjectIds.split("_"))
-                .mapToInt(Integer::parseInt).boxed().collect(Collectors.toSet());
+    public void setSubjectIds(List<Long> subjectIdList) {
+        this.subjectIds = subjectIdList.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining("_"));
     }
 }

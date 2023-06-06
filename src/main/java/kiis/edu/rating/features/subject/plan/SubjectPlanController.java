@@ -4,6 +4,7 @@ import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.subject.condition.SubjectConditionRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,7 +36,7 @@ public class SubjectPlanController {
     }
 
     @GetMapping("/group")
-    public List<DepartmentGroup> getAllByGroup() {
+    public List<BigGroup> getAllByGroup() {
 
         return subjectPlanService.createList();
     }
@@ -74,24 +75,23 @@ public class SubjectPlanController {
         if (!userRepository.existsById(request.userId))
             throw new IllegalArgumentException("No User with id : " + request.userId);
 
-        List<Long> existIds = subjectRepository.existsByIdList(idList);
-        idList.removeAll(existIds);
-        if (idList.size() > 0)
-            throw new IllegalArgumentException("Some Subject are not exist, ID: " + idList);
+        List<Long> existIds = subjectRepository.findByIdList(idList);
+        List<Long> remainIdList = idList.stream().filter(id -> !existIds.contains(id)).collect(Collectors.toList());
+        if (remainIdList.size() > 0)
+            throw new IllegalArgumentException("Some Subject are not exist, ID: " + remainIdList);
     }
 
+    @RequiredArgsConstructor
     private static class SubjectPlanRequest extends SubjectPlanEntity {
-        private long id;
-        private Instant createdAt, updatedAt;
-        private boolean disable;
+        private final long id;
+        private final Instant createdAt, updatedAt;
+        private final boolean disable;
 
-        public List<Long> subjectIdList;
+        public final List<Long> subjectIdList;
 
         public SubjectPlanEntity toEntity() {
-            SubjectPlanEntity entity = new SubjectPlanEntity();
-            entity.userId = this.userId;
-            entity.subjectIds = this.subjectIdList.stream().map(String::valueOf)
-                    .collect(Collectors.joining("_"));
+            SubjectPlanEntity entity = new SubjectPlanEntity(this.userId);
+            entity.setSubjectIds(subjectIdList);
             return entity;
         }
     }

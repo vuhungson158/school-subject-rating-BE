@@ -9,8 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -23,44 +23,31 @@ public class SubjectPlanService {
     private final SubjectRepository subjectRepository;
     private final SubjectConditionRepository subjectConditionRepository;
 
-    private Department currentDepartment;
     private Big currentBig;
     private Middle currentMiddle;
+    private List<SubjectEntity> subjectList;
+    private List<SubjectConditionEntity> conditionList;
 
-    public List<DepartmentGroup> createList() {
-        final List<DepartmentGroup> departmentGroupList = new ArrayList<>();
-        for (Department department : Department.values()) {
-            currentDepartment = department;
+    public List<BigGroup> createList() {
+        this.subjectList = subjectRepository.findAllByDisable(false);
+        this.conditionList = subjectConditionRepository.findAllByDisable(false);
 
-            if (department.equals(ALL)) continue;
-            final List<SubjectEntity> filteredByDepartment = filter(subjectRepository.findAllByDisable(false),
-                    subject -> subject.department.equals(department)
-                            || subject.department.equals(ALL));
-            DepartmentGroup departmentGroup = new DepartmentGroup(department, bigList(filteredByDepartment));
-            departmentGroupList.add(departmentGroup);
-        }
-        return departmentGroupList;
+        return bigList();
     }
 
 
-    private List<BigGroup> bigList(List<SubjectEntity> filteredByDepartment) {
+    private List<BigGroup> bigList() {
         final List<BigGroup> bigGroupList = new ArrayList<>();
         for (Big big : Big.values()) {
             currentBig = big;
 
-            final List<SubjectEntity> filteredByBig = filter(filteredByDepartment,
+            final List<SubjectEntity> filteredByBig = filter(subjectList,
                     subject -> subject.classification.getMiddle().getBig().equals(big));
             final List<MiddleGroup> middleGroupList = middleList(filteredByBig);
-            int bigRowspan = sumBigRowspan(middleGroupList);
-            final BigGroup bigGroup = new BigGroup(big, middleGroupList, bigRowspan);
+            final BigGroup bigGroup = new BigGroup(big, middleGroupList);
             bigGroupList.add(bigGroup);
         }
         return bigGroupList;
-    }
-
-    private int sumBigRowspan(List<MiddleGroup> middleList) {
-        return middleList.stream()
-                .reduce(0, (total, middle) -> total + middle.rowspan, Integer::sum);
     }
 
     private List<MiddleGroup> middleList(List<SubjectEntity> filteredByBig) {
@@ -72,15 +59,10 @@ public class SubjectPlanService {
             final List<SubjectEntity> filteredByMiddle = filter(filteredByBig,
                     subject -> subject.classification.getMiddle().equals(middle));
             final List<SmallGroup> smallGroupList = smallList(filteredByMiddle);
-            int middleRowspan = countMiddleRowspan(smallGroupList);
-            final MiddleGroup middleGroup = new MiddleGroup(middle, smallGroupList, middleRowspan);
+            final MiddleGroup middleGroup = new MiddleGroup(middle, smallGroupList);
             middleGroupList.add(middleGroup);
         }
         return middleGroupList;
-    }
-
-    private int countMiddleRowspan(List<SmallGroup> smallList) {
-        return smallList.size();
     }
 
     private List<SmallGroup> smallList(List<SubjectEntity> filteredByMiddle) {
@@ -88,11 +70,11 @@ public class SubjectPlanService {
 
         for (Small small : Small.values()) {
             if (!small.getMiddle().equals(currentMiddle)) continue;
-            if (!small.getDepartment().equals(currentDepartment)
-                    && !small.getDepartment().equals(ALL)) continue;
-            final List<SubjectEntity> filteredBySmall = filter(filteredByMiddle,
-                    subject -> subject.classification.equals(small));
-            final SmallGroup smallGroup = new SmallGroup(small, filteredBySmall, subjectConditionRepository.findAllByDisable(false));
+            final List<SubjectEntity> filteredBySmall = filter(
+                    filteredByMiddle, subject -> subject.classification.equals(small)
+                            && (subject.department.equals(small.getDepartment()) || subject.department.equals(ALL))
+            );
+            final SmallGroup smallGroup = new SmallGroup(small, filteredBySmall, conditionList);
             smallGroupList.add(smallGroup);
         }
         return smallGroupList;
@@ -103,64 +85,96 @@ public class SubjectPlanService {
     }
 }
 
-class DepartmentGroup extends Group<Department> {
-    public final List<BigGroup> bigList;
-
-    public DepartmentGroup(Department department, List<BigGroup> bigList) {
-        super(department, department.getLabel());
-        this.bigList = bigList;
-    }
-}
-
 class BigGroup extends Group<Big> {
     public final List<MiddleGroup> middleList;
     public final int creditNeeded;
-    public final int rowspan;
+    public final int requiredCredits;
+    public final Map<Department, Integer> rowspan = Department.frame();
 
-    public BigGroup(Big big, List<MiddleGroup> middleList, int rowspan) {
+    public BigGroup(Big big, List<MiddleGroup> middleList) {
         super(big, big.getLabel());
         this.creditNeeded = big.getCreditNeeded();
         this.middleList = middleList;
-        this.rowspan = rowspan;
+        this.middleList.forEach(middle -> middle.rowspan.forEach(this::add));
+        this.requiredCredits = middleList.stream()
+                .reduce(0, (total, middle) -> total + middle.requiredCredits, Integer::sum);
+    }
+
+    private void add(Department department, int row) {
+        Integer pre = this.rowspan.get(department);
+        this.rowspan.put(department, pre + row);
     }
 }
 
 class MiddleGroup extends Group<Middle> {
     public final List<SmallGroup> smallList;
     public final int creditNeeded;
-    public final int rowspan;
+    public final int requiredCredits;
+    public final Map<Department, Integer> rowspan = Department.frame();
 
-    public MiddleGroup(Middle middle, List<SmallGroup> smallList, int rowspan) {
+    public MiddleGroup(Middle middle, List<SmallGroup> smallList) {
         super(middle, middle.getLabel());
         this.creditNeeded = middle.getCreditNeeded();
         this.smallList = smallList;
-        this.rowspan = rowspan;
+        this.fillMap();
+        this.requiredCredits = this.countRequiredCredits();
+    }
+
+    private void fillMap() {
+        this.smallList.forEach(small -> {
+            if (!small.department.equals(ALL)) {
+                increase(small.department);
+            } else {
+                Department.getValues().forEach(this::increase);
+            }
+        });
+    }
+
+    private void increase(Department department) {
+        Integer pre = this.rowspan.get(department);
+        this.rowspan.put(department, pre + 1);
+    }
+
+    private int countRequiredCredits() {
+        AtomicInteger total = new AtomicInteger();
+        this.smallList.forEach(small -> {
+            small.yearList.forEach(year -> {
+                year.forEach(subject -> {
+                    if (subject.subjectEntity.require) total.addAndGet(subject.subjectEntity.unit);
+                });
+            });
+        });
+        return total.get();
     }
 }
 
 class SmallGroup extends Group<Small> {
     public final List<List<SubjectWithCondition>> yearList;
+    public final Department department;
+
+    private final List<SubjectConditionEntity> conditionList;
+    private final List<SubjectEntity> subjectList;
 
     public SmallGroup(Small small, List<SubjectEntity> subjectEntityList,
                       List<SubjectConditionEntity> conditionList) {
         super(small, small.getLabel());
+        this.department = small.getDepartment();
+        this.conditionList = conditionList;
+        this.subjectList = subjectEntityList;
 
         List<List<SubjectWithCondition>> yearList = new ArrayList<>();
         for (int i = 1; i <= 2; i++) {
-            final int year = i;
-            List<SubjectWithCondition> subjectListByYear = subjectEntityList.stream()
-                    .filter(subject -> subject.formYear == year)
-                    .map(subject -> new SubjectWithCondition(subject, conditionList))
-                    .collect(Collectors.toList());
-            yearList.add(subjectListByYear);
-
+            yearList.add(filterByYear(Collections.singletonList(i)));
         }
-        List<SubjectWithCondition> subjectListByYear = subjectEntityList.stream()
-                .filter(subject -> subject.formYear == 3 || subject.formYear == 4)
+        yearList.add(filterByYear(Arrays.asList(3, 4)));
+        this.yearList = yearList;
+    }
+
+    private List<SubjectWithCondition> filterByYear(List<Integer> years) {
+        return subjectList.stream()
+                .filter(subject -> years.contains(subject.formYear))
                 .map(subject -> new SubjectWithCondition(subject, conditionList))
                 .collect(Collectors.toList());
-        yearList.add(subjectListByYear);
-        this.yearList = yearList;
     }
 }
 
@@ -172,11 +186,11 @@ class Group<N> {
 
 class SubjectWithCondition {
     final public SubjectEntity subjectEntity;
-    final public List<Long> condition;
+    final public List<Long> conditionList;
 
     public SubjectWithCondition(SubjectEntity subjectEntity, List<SubjectConditionEntity> conditionList) {
         this.subjectEntity = subjectEntity;
-        this.condition = conditionList.stream()
+        this.conditionList = conditionList.stream()
                 .filter(condition -> condition.toId == subjectEntity.id)
                 .map(condition -> condition.fromId)
                 .collect(Collectors.toList());
