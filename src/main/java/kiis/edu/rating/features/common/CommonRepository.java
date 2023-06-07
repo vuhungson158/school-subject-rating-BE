@@ -16,7 +16,7 @@ public interface CommonRepository extends JpaRepository<StatisticsEntity, Long> 
                     + " \n (select count(disable = false or null) from subject_comment limit 1) as total_subject_comment,"
                     + " \n (select count(disable = false or null) from subject_comment_react scr  limit 1) as total_subject_comment_react,"
                     + " \n (select count(disable = false or null) from subject_rating sr  limit 1) as total_subject_rating,"
-                    + " \n (select count(disable = false or null) from teacher limit 1) as total_teacher,"
+                    + " \n (select count(teacher.disable = false or null) from teacher limit 1) as total_teacher,"
                     + " \n (select count(disable = false or null) from teacher_comment limit 1) as total_teacher_comment,"
                     + " \n (select count(disable = false or null) from teacher_comment_react limit 1) as total_teacher_comment_react,"
                     + " \n (select count(disable = false or null) from teacher_rating limit 1) as total_teacher_rating"
