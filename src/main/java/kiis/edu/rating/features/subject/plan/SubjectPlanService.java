@@ -137,13 +137,9 @@ class MiddleGroup extends Group<Middle> {
 
     private int countRequiredCredits() {
         AtomicInteger total = new AtomicInteger();
-        this.smallList.forEach(small -> {
-            small.yearList.forEach(year -> {
-                year.forEach(subject -> {
-                    if (subject.subjectEntity.require) total.addAndGet(subject.subjectEntity.unit);
-                });
-            });
-        });
+        this.smallList.forEach(small -> small.yearList.forEach(year -> year.forEach(subject -> {
+            if (subject.subjectEntity.require) total.addAndGet(subject.subjectEntity.credit);
+        })));
         return total.get();
     }
 }

@@ -26,7 +26,7 @@ public class SubjectEntity extends BaseEntity {
     public long teacherId;
     @Min(value = 1, message = "Min = 1")
     @Max(value = 6, message = "Max = 6")
-    public int unit;
+    public int credit;
     @Min(value = 1, message = "Min = 1")
     @Max(value = 4, message = "Max = 4")
     public int formYear;
