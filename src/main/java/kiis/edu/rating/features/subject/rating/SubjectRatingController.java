@@ -2,8 +2,6 @@ package kiis.edu.rating.features.subject.rating;
 
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
-import kiis.edu.rating.features.user.UserRole;
-import kiis.edu.rating.features.user.UserRole.SubjectRating;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +10,7 @@ import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/subject-rating")
@@ -60,8 +58,6 @@ public class SubjectRatingController {
 
     @PostMapping("")
     public void create(@RequestBody @Valid SubjectRatingRequest request) {
-        UserRole.requirePermission(SubjectRating.CREATE);
-
         long subjectId = request.subjectId;
         long userId = request.userId;
 
@@ -77,8 +73,6 @@ public class SubjectRatingController {
 
     @PutMapping("/{id}")
     public void update(@PathVariable long id, @RequestBody @Valid SubjectRatingRequest request) {
-        UserRole.requirePermission(SubjectRating.UPDATE);
-
         if (!subjectRatingRepository.existsById(id))
             throw new IllegalArgumentException("No Rating with Id: " + id);
         SubjectRatingEntity subjectRatingEntity = request.toEntity();
@@ -88,8 +82,6 @@ public class SubjectRatingController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        UserRole.requirePermission(SubjectRating.DELETE);
-
         subjectRatingRepository.deleteById(id);
     }
 

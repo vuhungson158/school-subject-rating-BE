@@ -13,6 +13,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 class StatisticsEntity {
     @Id
+    @SuppressWarnings("unused")
     private Long id;
     public long totalUser, totalManager, totalAdmin,
             totalSubject, totalSubjectComment, totalSubjectCommentReact, totalSubjectRating,

@@ -2,8 +2,6 @@ package kiis.edu.rating.features.teacher.rating;
 
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
-import kiis.edu.rating.features.user.UserRole;
-import kiis.edu.rating.features.user.UserRole.TeacherRating;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +10,7 @@ import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/teacher-rating")
@@ -55,10 +53,9 @@ public class TeacherRatingController {
     public TeacherRatingAverage getAverageByTeacherId(@PathVariable("id") long teacherId) {
         return teacherRatingAverageRepository.findTeacherRatingAverageByTeacherId(teacherId);
     }
+
     @PostMapping("")
     public void create(@RequestBody @Valid TeacherRatingController.TeacherRatingRequest request) {
-        UserRole.requirePermission(TeacherRating.CREATE);
-
         long teacherId = request.teacherId;
         long userId = request.userId;
 
@@ -73,8 +70,6 @@ public class TeacherRatingController {
 
     @PutMapping("/{id}")
     public void update(@PathVariable long id, @RequestBody @Valid TeacherRatingController.TeacherRatingRequest request) {
-        UserRole.requirePermission(TeacherRating.UPDATE);
-
         if (!teacherRatingRepository.existsById(id))
             throw new IllegalArgumentException("No Rating with Id: " + id);
         TeacherRatingEntity ratingEntity = request.toEntity();
@@ -84,8 +79,6 @@ public class TeacherRatingController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        UserRole.requirePermission(TeacherRating.DELETE);
-
         teacherRatingRepository.deleteById(id);
     }
 

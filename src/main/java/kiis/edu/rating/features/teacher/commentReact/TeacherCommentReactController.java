@@ -2,8 +2,6 @@ package kiis.edu.rating.features.teacher.commentReact;
 
 import kiis.edu.rating.features.teacher.comment.TeacherCommentRepository;
 import kiis.edu.rating.features.user.UserRepository;
-import kiis.edu.rating.features.user.UserRole;
-import kiis.edu.rating.features.user.UserRole.TeacherCommentReact;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/teacher-comment-react")
@@ -35,8 +33,6 @@ public class TeacherCommentReactController {
 
     @PostMapping("")
     public void create(@RequestBody TeacherCommentReactRequest request) {
-        UserRole.requirePermission(TeacherCommentReact.CREATE);
-
         if (!teacherCommentRepository.existsById(request.commentId))
             throw new IllegalArgumentException("No Comment with Id: " + request.commentId);
         if (!userRepository.existsById(request.userId))
@@ -48,8 +44,6 @@ public class TeacherCommentReactController {
 
     @PutMapping("/{id}")
     public void update(@PathVariable long id, @RequestBody TeacherCommentReactRequest request) {
-        UserRole.requirePermission(TeacherCommentReact.UPDATE);
-
         if (!teacherCommentReactRepository.existsById(id))
             throw new IllegalArgumentException("No comment React with id : " + id);
         TeacherCommentReactEntity teacherCommentReactEntity = request.toEntity();
@@ -59,8 +53,6 @@ public class TeacherCommentReactController {
 
     @DeleteMapping("/{id}")
     public void deleteRating(@PathVariable long id) {
-        UserRole.requirePermission(TeacherCommentReact.DELETE);
-
         teacherCommentReactRepository.deleteById(id);
     }
 

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static kiis.edu.rating.helper.Constant.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @AllArgsConstructor
 @RestController
 @RequestMapping(path = "/user")

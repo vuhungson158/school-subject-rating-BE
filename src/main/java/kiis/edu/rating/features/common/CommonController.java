@@ -14,7 +14,6 @@ public class CommonController {
 
     @GetMapping("/statistics")
     public StatisticsEntity getStatistics() {
-
         return commonRepository.findAll().get(0);
     }
 }

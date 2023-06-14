@@ -2,8 +2,6 @@ package kiis.edu.rating.features.teacher.base;
 
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
-import kiis.edu.rating.features.user.UserRole;
-import kiis.edu.rating.features.user.UserRole.Teacher;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/teacher")
@@ -33,22 +31,16 @@ public class TeacherController {
 
     @GetMapping("/all")
     public List<TeacherEntity> getAll() {
-        UserRole.requirePermission(Teacher.GET_ALL);
-
         return teacherRepository.findAll();
     }
 
     @PostMapping("")
     public void create(@RequestBody TeacherRequest request) {
-        UserRole.requirePermission(Teacher.CREATE);
-
         teacherRepository.save(request.toEntity());
     }
 
     @PutMapping("/{id}")
     public void update(@PathVariable long id, @RequestBody TeacherRequest request) {
-        UserRole.requirePermission(Teacher.UPDATE);
-
         if (!teacherRepository.existsById(id))
             throw new IllegalArgumentException("No Teacher with ID:" + id);
         TeacherEntity teacherEntity = request.toEntity();
@@ -58,8 +50,6 @@ public class TeacherController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        UserRole.requirePermission(Teacher.DELETE);
-
         TeacherEntity teacherEntity = teacherRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No Teacher with Id: " + id));
         subjectRepository.updateDisableSubjectByTeacherId(id, true);

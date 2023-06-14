@@ -2,8 +2,6 @@ package kiis.edu.rating.features.subject.comment;
 
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
-import kiis.edu.rating.features.user.UserRole;
-import kiis.edu.rating.features.user.UserRole.SubjectComment;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +10,7 @@ import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/subject-comment")
@@ -24,16 +22,12 @@ public class SubjectCommentController {
 
     @GetMapping("/{id}")
     public SubjectCommentWithLikeCount getById(@PathVariable long id) {
-        UserRole.requirePermission(SubjectComment.GET_BY_ID);
-
         return subjectCommentWithLikeCountRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No Comment with Id: " + id));
     }
 
     @GetMapping("")
     public List<SubjectCommentEntity> getAllEnable() {
-        UserRole.requirePermission(SubjectComment.GET_ALL);
-
         return subjectCommentRepository.findAllByDisable(false);
     }
 
@@ -54,8 +48,6 @@ public class SubjectCommentController {
 
     @PostMapping("")
     public void create(@RequestBody @Valid SubjectCommentRequest request) {
-        UserRole.requirePermission(SubjectComment.CREATE);
-
         long userId = request.userId;
         long subjectId = request.subjectId;
 
@@ -71,8 +63,6 @@ public class SubjectCommentController {
 
     @PutMapping("/{id}")
     public void update(@PathVariable long id, @RequestBody @Valid SubjectCommentRequest request) {
-        UserRole.requirePermission(SubjectComment.UPDATE);
-
         if (!subjectCommentRepository.existsById(id))
             throw new IllegalArgumentException("No comment with id : " + id);
         SubjectCommentEntity commentEntity = request.toEntity();
@@ -82,8 +72,6 @@ public class SubjectCommentController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        UserRole.requirePermission(SubjectComment.DELETE);
-
         subjectCommentRepository.deleteById(id);
     }
 

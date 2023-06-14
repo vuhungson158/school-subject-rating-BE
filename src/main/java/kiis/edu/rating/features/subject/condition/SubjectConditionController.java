@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/subject-condition")
@@ -56,7 +56,7 @@ public class SubjectConditionController {
     // private
     //------------------------------------------------------------------------------------------------
 
-    private void validateRequest(SubjectConditionRequest request){
+    private void validateRequest(SubjectConditionRequest request) {
         Long fromId = request.fromId;
         Long toId = request.toId;
         if (!subjectRepository.existsById(fromId))
@@ -85,7 +85,7 @@ public class SubjectConditionController {
         public ConditionGraph(List<SubjectConditionEntity> subjectConditionList) {
             this.subjectConditionList = subjectConditionList;
             Set<Long> subjectIdSet = new HashSet<>();
-            subjectConditionList.forEach(condition ->{
+            subjectConditionList.forEach(condition -> {
                 subjectIdSet.add(condition.fromId);
                 subjectIdSet.add(condition.toId);
             });

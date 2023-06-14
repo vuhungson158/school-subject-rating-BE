@@ -2,8 +2,6 @@ package kiis.edu.rating.features.teacher.comment;
 
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.features.user.UserRepository;
-import kiis.edu.rating.features.user.UserRole;
-import kiis.edu.rating.features.user.UserRole.TeacherComment;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +10,7 @@ import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/teacher-comment")
@@ -42,8 +40,6 @@ public class TeacherCommentController {
 
     @PostMapping("")
     public void create(@RequestBody @Valid TeacherCommentRequest request) {
-        UserRole.requirePermission(TeacherComment.CREATE);
-
         long userId = request.userId;
         long teacherId = request.teacherId;
 
@@ -59,8 +55,6 @@ public class TeacherCommentController {
 
     @PutMapping("/{id}")
     public void update(@PathVariable long id, @RequestBody @Valid TeacherCommentRequest request) {
-        UserRole.requirePermission(TeacherComment.UPDATE);
-
         if (!teacherCommentRepository.existsById(id))
             throw new IllegalArgumentException("No comment with id : " + id);
         TeacherCommentEntity commentEntity = request.toEntity();
@@ -70,8 +64,6 @@ public class TeacherCommentController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        UserRole.requirePermission(TeacherComment.DELETE);
-
         teacherCommentRepository.deleteById(id);
     }
 

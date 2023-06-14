@@ -1,8 +1,7 @@
 package kiis.edu.rating.features.subject.base;
 
+import kiis.edu.rating.aop.AllowPermission;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
-import kiis.edu.rating.features.user.UserRole;
-import kiis.edu.rating.features.user.UserRole.Subject;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
+
+import static kiis.edu.rating.features.user.UserRole.Permission.*;
 
 @SuppressWarnings("unused")
 @RestController
@@ -31,15 +32,14 @@ public class SubjectController {
     }
 
     @GetMapping("/all")
+    @AllowPermission(SUBJECT__GET_ALL)
     public List<SubjectEntity> getAll() {
-        UserRole.requirePermission(Subject.GET_ALL);
-
         return subjectRepository.findAll();
     }
 
     @PostMapping("")
+    @AllowPermission(SUBJECT__CREATE)
     public void create(@RequestBody @Valid SubjectRequest request) {
-        UserRole.requirePermission(Subject.CREATE);
 
         if (!teacherRepository.existsById(request.teacherId))
             throw new IllegalArgumentException("No teacher with id : " + request.teacherId);
@@ -47,8 +47,8 @@ public class SubjectController {
     }
 
     @PutMapping("/{id}")
+    @AllowPermission(SUBJECT__UPDATE)
     public void update(@PathVariable long id, @RequestBody @Valid SubjectRequest request) {
-        UserRole.requirePermission(Subject.UPDATE);
 
         if (!subjectRepository.existsById(id))
             throw new IllegalArgumentException("No Subject with Id: " + id);
@@ -58,8 +58,8 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
+    @AllowPermission(SUBJECT__DELETE)
     public void delete(@PathVariable long id) {
-        UserRole.requirePermission(Subject.DELETE);
 
         SubjectEntity subjectEntity = subjectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No subject with id : " + id));
