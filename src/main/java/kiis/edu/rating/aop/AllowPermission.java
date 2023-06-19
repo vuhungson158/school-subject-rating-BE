@@ -1,6 +1,6 @@
 package kiis.edu.rating.aop;
 
-import kiis.edu.rating.features.user.UserRole.Permission;
+import kiis.edu.rating.features.user.UserRole;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,5 +10,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AllowPermission {
-    Permission value();
+    UserRole.Feature feature();
+
+    UserRole.Method method();
 }

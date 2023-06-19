@@ -1,8 +1,6 @@
 package kiis.edu.rating.aop;
 
 
-import kiis.edu.rating.features.user.UserRole.Permission;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,12 +12,12 @@ import java.util.Collection;
 
 @Aspect
 @Component
-public class AllowPermissionHandler {
+public class AOPHandler {
 
     @Before("@annotation(allowPermission)")
-    public void before(JoinPoint joinPoint, AllowPermission allowPermission) {
+    public void before(AllowPermission allowPermission) {
 
-        String permissionName = allowPermission.value().name();
+        String permissionName = allowPermission.feature().concat(allowPermission.method());
         Collection<? extends GrantedAuthority> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 

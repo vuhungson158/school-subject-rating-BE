@@ -10,7 +10,8 @@ import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 
-import static kiis.edu.rating.features.user.UserRole.Permission.*;
+import static kiis.edu.rating.features.user.UserRole.Feature.SUBJECT;
+import static kiis.edu.rating.features.user.UserRole.Method.*;
 
 @SuppressWarnings("unused")
 @RestController
@@ -32,13 +33,13 @@ public class SubjectController {
     }
 
     @GetMapping("/all")
-    @AllowPermission(SUBJECT__GET_ALL)
+    @AllowPermission(feature = SUBJECT, method = GET_ALL)
     public List<SubjectEntity> getAll() {
         return subjectRepository.findAll();
     }
 
     @PostMapping("")
-    @AllowPermission(SUBJECT__CREATE)
+    @AllowPermission(feature = SUBJECT, method = CREATE)
     public void create(@RequestBody @Valid SubjectRequest request) {
 
         if (!teacherRepository.existsById(request.teacherId))
@@ -47,7 +48,7 @@ public class SubjectController {
     }
 
     @PutMapping("/{id}")
-    @AllowPermission(SUBJECT__UPDATE)
+    @AllowPermission(feature = SUBJECT, method = UPDATE)
     public void update(@PathVariable long id, @RequestBody @Valid SubjectRequest request) {
 
         if (!subjectRepository.existsById(id))
@@ -58,7 +59,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
-    @AllowPermission(SUBJECT__DELETE)
+    @AllowPermission(feature = SUBJECT, method = DELETE)
     public void delete(@PathVariable long id) {
 
         SubjectEntity subjectEntity = subjectRepository.findById(id)

@@ -3,60 +3,71 @@ package kiis.edu.rating.features.user;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static kiis.edu.rating.features.user.UserRole.Permission.*;
+import static kiis.edu.rating.features.user.UserRole.Feature.*;
+import static kiis.edu.rating.features.user.UserRole.Method.*;
 
 @Getter
 public enum UserRole {
-    ADMIN(Permission.values()),
+    ADMIN(Feature.altogether()),
     MANAGER(
-            SUBJECT__GET_ALL, SUBJECT__CREATE, SUBJECT__UPDATE, SUBJECT__DELETE,
-            SUBJECT_RATING__GET_ALL, SUBJECT_RATING__CREATE, SUBJECT_RATING__UPDATE, SUBJECT_RATING__DELETE,
-            SUBJECT_COMMENT__GET_ALL, SUBJECT_COMMENT__CREATE, SUBJECT_COMMENT__UPDATE, SUBJECT_COMMENT__DELETE
+            SUBJECT.all(),
+            SUBJECT_RATING.all(),
+            SUBJECT_COMMENT.all()
     ),
     USER(
-            TEACHER__GET_ALL, TEACHER__CREATE, TEACHER__UPDATE, TEACHER__DELETE,
-            TEACHER_RATING__GET_ALL, TEACHER_RATING__CREATE, TEACHER_RATING__UPDATE, TEACHER_RATING__DELETE,
-            TEACHER_COMMENT__GET_ALL, TEACHER_COMMENT__CREATE, TEACHER_COMMENT__UPDATE, TEACHER_COMMENT__DELETE,
-            TEACHER_COMMENT_REACT__GET_ALL, TEACHER_COMMENT_REACT__CREATE
+            TEACHER.methods(GET_ALL, CREATE),
+            TEACHER_COMMENT.methods(UPDATE, DELETE)
     );
 
-    private final Set<Permission> authorities;
+    private final Set<String> authorities;
 
-    UserRole(Permission... authorities) {
-        Set<Permission> userAuthorities = new HashSet<>();
-        Collections.addAll(userAuthorities, authorities);
+    @SafeVarargs
+    UserRole(Set<String>... sets) {
+        Set<String> userAuthorities = new HashSet<>();
+        Arrays.stream(sets).forEach(userAuthorities::addAll);
         this.authorities = userAuthorities;
     }
 
     public Set<SimpleGrantedAuthority> getGrantedAuthorities() {
         Set<SimpleGrantedAuthority> permissions = this.authorities.stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.name()))
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
         permissions.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
         return permissions;
     }
 
-//    public Set<String> getPermissions() {
-//        return authorities.stream().map(Enum::name).collect(Collectors.toSet());
-//    }
+    public enum Method {
+        GET_ALL, GET_ENABLED, GET_BY_ID, CREATE, UPDATE, DELETE,
+    }
 
-    public enum Permission {
-        SUBJECT__GET_ALL, SUBJECT__CREATE, SUBJECT__UPDATE, SUBJECT__DELETE,
-        SUBJECT_RATING__GET_ALL, SUBJECT_RATING__CREATE, SUBJECT_RATING__UPDATE, SUBJECT_RATING__DELETE,
-        SUBJECT_COMMENT__GET_ALL, SUBJECT_COMMENT__CREATE, SUBJECT_COMMENT__UPDATE, SUBJECT_COMMENT__DELETE,
-        SUBJECT_COMMENT_REACT__GET_ALL, SUBJECT_COMMENT_REACT__CREATE, SUBJECT_COMMENT_REACT__UPDATE, SUBJECT_COMMENT_REACT__DELETE,
+    public enum Feature {
+        SUBJECT, SUBJECT_RATING, SUBJECT_COMMENT, SUBJECT_COMMENT_REACT,
+        TEACHER, TEACHER_RATING, TEACHER_COMMENT, TEACHER_COMMENT_REACT,
+        FILE, OTHER;
 
-        TEACHER__GET_ALL, TEACHER__CREATE, TEACHER__UPDATE, TEACHER__DELETE,
-        TEACHER_RATING__GET_ALL, TEACHER_RATING__CREATE, TEACHER_RATING__UPDATE, TEACHER_RATING__DELETE,
-        TEACHER_COMMENT__GET_ALL, TEACHER_COMMENT__CREATE, TEACHER_COMMENT__UPDATE, TEACHER_COMMENT__DELETE,
-        TEACHER_COMMENT_REACT__GET_ALL, TEACHER_COMMENT_REACT__CREATE, TEACHER_COMMENT_REACT__UPDATE, TEACHER_COMMENT_REACT__DELETE,
+        public String concat(Method method) {
+            return this.name() + "_" + method.name();
+        }
 
-        FILE__GET_ALL, FILE__CREATE, FILE__UPDATE, FILE__DELETE,
-        OTHER__GET_ALL, OTHER__CREATE, OTHER__UPDATE, OTHER__DELETE
+        public Set<String> methods(Method... methods) {
+            return Arrays.stream(methods).map(this::concat).collect(Collectors.toSet());
+        }
+
+        public Set<String> all() {
+            return methods(Method.values());
+        }
+
+        public static Set<String> altogether() {
+            Set<String> result = new HashSet<>();
+            Arrays.stream(Feature.values()).forEach(feature -> {
+                result.addAll(feature.all());
+            });
+            return result;
+        }
     }
 }
