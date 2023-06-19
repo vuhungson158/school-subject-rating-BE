@@ -2,7 +2,6 @@ package kiis.edu.rating.features.subject.base;
 
 import kiis.edu.rating.aop.AllowFeature;
 import kiis.edu.rating.aop.AllowMethod;
-import kiis.edu.rating.aop.AllowPermission;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;

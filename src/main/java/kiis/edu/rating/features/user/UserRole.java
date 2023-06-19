@@ -1,5 +1,6 @@
 package kiis.edu.rating.features.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -27,9 +28,13 @@ public enum UserRole {
     private final Set<String> authorities;
 
     @SafeVarargs
-    UserRole(Set<String>... sets) {
+    UserRole(Set<Combinator>... sets) {
         Set<String> userAuthorities = new HashSet<>();
-        Arrays.stream(sets).forEach(userAuthorities::addAll);
+        Arrays.stream(sets).forEach(combinators -> userAuthorities.addAll(
+                combinators.stream()
+                        .map(Combinator::concat)
+                        .collect(Collectors.toSet())
+        ));
         this.authorities = userAuthorities;
     }
 
@@ -50,24 +55,38 @@ public enum UserRole {
         TEACHER, TEACHER_RATING, TEACHER_COMMENT, TEACHER_COMMENT_REACT,
         FILE, OTHER;
 
+        private Combinator combinator(Method method) {
+            return new Combinator(this, method);
+        }
+
         public String concat(Method method) {
-            return this.name() + "_" + method.name();
+            return combinator(method).concat();
         }
 
-        public Set<String> methods(Method... methods) {
-            return Arrays.stream(methods).map(this::concat).collect(Collectors.toSet());
+        public Set<Combinator> methods(Method... methods) {
+            return Arrays.stream(methods)
+                    .map(method -> new Combinator(this, method))
+                    .collect(Collectors.toSet());
         }
 
-        public Set<String> all() {
+        public Set<Combinator> all() {
             return methods(Method.values());
         }
 
-        public static Set<String> altogether() {
-            Set<String> result = new HashSet<>();
-            Arrays.stream(Feature.values()).forEach(feature -> {
-                result.addAll(feature.all());
-            });
+        public static Set<Combinator> altogether() {
+            Set<Combinator> result = new HashSet<>();
+            Arrays.stream(Feature.values()).forEach(feature -> result.addAll(feature.all()));
             return result;
+        }
+    }
+
+    @AllArgsConstructor
+    private static class Combinator {
+        private final Feature feature;
+        private final Method method;
+
+        public String concat() {
+            return feature.name() + "_" + method.name();
         }
     }
 }
