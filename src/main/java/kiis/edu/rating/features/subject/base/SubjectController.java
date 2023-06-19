@@ -1,5 +1,7 @@
 package kiis.edu.rating.features.subject.base;
 
+import kiis.edu.rating.aop.AllowFeature;
+import kiis.edu.rating.aop.AllowMethod;
 import kiis.edu.rating.aop.AllowPermission;
 import kiis.edu.rating.features.teacher.base.TeacherRepository;
 import kiis.edu.rating.helper.Util;
@@ -17,6 +19,7 @@ import static kiis.edu.rating.features.user.UserRole.Method.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/subject")
+@AllowFeature(SUBJECT)
 public class SubjectController {
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
@@ -33,13 +36,13 @@ public class SubjectController {
     }
 
     @GetMapping("/all")
-    @AllowPermission(feature = SUBJECT, method = GET_ALL)
+    @AllowMethod(GET_ALL)
     public List<SubjectEntity> getAll() {
         return subjectRepository.findAll();
     }
 
     @PostMapping("")
-    @AllowPermission(feature = SUBJECT, method = CREATE)
+    @AllowMethod(CREATE)
     public void create(@RequestBody @Valid SubjectRequest request) {
 
         if (!teacherRepository.existsById(request.teacherId))
@@ -48,7 +51,7 @@ public class SubjectController {
     }
 
     @PutMapping("/{id}")
-    @AllowPermission(feature = SUBJECT, method = UPDATE)
+    @AllowMethod(UPDATE)
     public void update(@PathVariable long id, @RequestBody @Valid SubjectRequest request) {
 
         if (!subjectRepository.existsById(id))
@@ -59,7 +62,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
-    @AllowPermission(feature = SUBJECT, method = DELETE)
+    @AllowMethod(DELETE)
     public void delete(@PathVariable long id) {
 
         SubjectEntity subjectEntity = subjectRepository.findById(id)

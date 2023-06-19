@@ -1,5 +1,7 @@
 package kiis.edu.rating.features.teacher.base;
 
+import kiis.edu.rating.aop.AllowFeature;
+import kiis.edu.rating.aop.AllowMethod;
 import kiis.edu.rating.features.subject.base.SubjectRepository;
 import kiis.edu.rating.features.user.UserRepository;
 import kiis.edu.rating.helper.Util;
@@ -9,10 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 
+import static kiis.edu.rating.features.user.UserRole.Feature.TEACHER;
+import static kiis.edu.rating.features.user.UserRole.Method.GET_ALL;
+
 @SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/teacher")
+@AllowFeature(TEACHER)
 public class TeacherController {
     private final TeacherRepository teacherRepository;
     private final SubjectRepository subjectRepository;
@@ -30,6 +36,7 @@ public class TeacherController {
     }
 
     @GetMapping("/all")
+    @AllowMethod(GET_ALL)
     public List<TeacherEntity> getAll() {
         return teacherRepository.findAll();
     }
