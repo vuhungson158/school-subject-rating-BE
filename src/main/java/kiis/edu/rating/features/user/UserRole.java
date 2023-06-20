@@ -86,7 +86,7 @@ public enum UserRole {
         private final Method method;
 
         public String concat() {
-            return feature.name() + "_" + method.name();
+            return feature.name() + "__" + method.name();
         }
     }
 }
