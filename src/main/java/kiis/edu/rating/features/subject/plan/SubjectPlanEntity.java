@@ -5,9 +5,10 @@ import kiis.edu.rating.features.common.BaseEntity;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.ArrayList;
+import javax.persistence.Transient;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,8 +24,10 @@ public class SubjectPlanEntity extends BaseEntity {
 
     private String subjectIds;
 
+    @ElementCollection
+    @Transient
     @SuppressWarnings("unused")
-    public List<Long> getSubjectIds() {
+    public List<Long> getSubjectIdList() {
         return Arrays.stream(subjectIds.split("_"))
                 .mapToLong(Long::parseLong).boxed().collect(Collectors.toList());
     }

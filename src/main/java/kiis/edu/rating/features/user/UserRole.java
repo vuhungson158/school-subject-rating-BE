@@ -47,7 +47,13 @@ public enum UserRole {
     }
 
     public enum Method {
-        GET_ALL, GET_ENABLED, GET_BY_ID, CREATE, UPDATE, DELETE,
+        GET_ALL("all"), GET_ENABLED(""), GET_BY_ID(""), CREATE(""), UPDATE(""), DELETE(""), SWITCH_DISABLED("");
+
+        public final String value;
+
+        Method(String value) {
+            this.value = value;
+        }
     }
 
     public enum Feature {
@@ -71,7 +77,7 @@ public enum UserRole {
 
         public Set<Combinator> all() {
             return methods(Method.values());
-        }
+        } 
 
         public static Set<Combinator> altogether() {
             Set<Combinator> result = new HashSet<>();
