@@ -13,12 +13,12 @@ configurations {
         extendsFrom annotationProcessor
     }
 }
-//
-//jar {
-//    manifest {
-//        attributes 'Main-Class': 'kiis.edu.rating.RatingApplication'
-//    }
-//}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'kiis.edu.rating.RatingApplication'
+    }
+}
 
 repositories {
     mavenCentral()
