@@ -35,3 +35,44 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### IntelliJ ###
+/DDL/public/auth_user.sql
+/DDL/public/auth_user_id_seq.sql
+/DDL/public/classification.sql
+/DDL/public/department.sql
+/DDL/public/existsbyuseridandcommentid.sql
+/DDL/public/existsbyuseridandsubjectid.sql
+/DDL/public/gender.sql
+/DDL/public/random_100.sql
+/DDL/public/random_between.sql
+/DDL/public/random_gender.sql
+/DDL/public/random_subject_comment.sql
+/DDL/public/random_subject_comment_id.sql
+/DDL/public/random_subject_id.sql
+/DDL/public/random_user_id.sql
+/DDL/public/statistic_view.sql
+/DDL/public/subject.sql
+/DDL/public/subject_comment.sql
+/DDL/public/subject_comment_id_seq.sql
+/DDL/public/subject_comment_react.sql
+/DDL/public/subject_comment_react_id_seq.sql
+/DDL/public/subject_condition.sql
+/DDL/public/subject_id_arr.sql
+/DDL/public/subject_id_seq.sql
+/DDL/public/subject_plan.sql
+/DDL/public/subject_rating.sql
+/DDL/public/subject_rating_id_seq.sql
+/DDL/public/subject_registration_condition_id_seq.sql
+/DDL/public/subject_registration_plan_id_seq.sql
+/DDL/public/teacher.sql
+/DDL/public/teacher_comment.sql
+/DDL/public/teacher_comment_id_seq.sql
+/DDL/public/teacher_comment_react.sql
+/DDL/public/teacher_comment_react_id_seq.sql
+/DDL/public/teacher_id_seq.sql
+/DDL/public/teacher_rating.sql
+/DDL/public/teacher_rating_id_seq.sql
+/DDL/public/test.sql
+/DDL/public/trigger_set_timestamp.sql
+/DDL/public/user_role.sql

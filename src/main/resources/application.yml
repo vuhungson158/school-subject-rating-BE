@@ -1,8 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password:
+#    url: jdbc:postgresql://localhost:5432/postgres
+#    username: postgres
+#    password:
+    url: jdbc:postgresql://arjuna.db.elephantsql.com:5432/qyulntal
+    username: qyulntal
+    password: ZV_kP3INAI0W_sp29K21GEgCnJJGl1OC
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
