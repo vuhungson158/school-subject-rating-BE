@@ -54,8 +54,8 @@ public class SubjectController {
     public void update(@PathVariable long id, @RequestBody @Valid SubjectRequest request) {
 
         if (!subjectRepository.existsById(id))
-            throw new IllegalArgumentException("No Subject with Id: " + id);
-        SubjectEntity subjectEntity = request.toEntity();
+             throw new IllegalArgumentException("No Subject with Id: " + id);
+        final SubjectEntity subjectEntity = request.toEntity();
         subjectEntity.id = id;
         subjectRepository.save(subjectEntity);
     }
@@ -64,7 +64,7 @@ public class SubjectController {
     @AllowMethod(DELETE)
     public void delete(@PathVariable long id) {
 
-        SubjectEntity subjectEntity = subjectRepository.findById(id)
+        final SubjectEntity subjectEntity = subjectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No subject with id : " + id));
         subjectEntity.disable = true;
         subjectRepository.save(subjectEntity);

@@ -48,8 +48,8 @@ public class SubjectCommentController {
 
     @PostMapping("")
     public void create(@RequestBody @Valid SubjectCommentRequest request) {
-        long userId = request.userId;
-        long subjectId = request.subjectId;
+        final long userId = request.userId;
+        final long subjectId = request.subjectId;
 
         if (!userRepository.existsById(userId))
             throw new IllegalArgumentException("No User with id : " + userId);

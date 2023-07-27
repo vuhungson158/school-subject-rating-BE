@@ -38,4 +38,6 @@ public class SubjectEntity extends BaseEntity {
     @Type(type = "classification")
     public SubjectClassification.Small classification;
     public boolean require = false;
+    public String semester = "";
+    public String schedule = "";
 }

@@ -14,7 +14,6 @@ import javax.persistence.Table;
 class SubjectCommentEntity extends BaseSubjectCommentEntity {
 }
 
-@SuppressWarnings("unused")
 @Entity
 class SubjectCommentWithLikeCount extends BaseSubjectCommentEntity {
     public int likeCount;
