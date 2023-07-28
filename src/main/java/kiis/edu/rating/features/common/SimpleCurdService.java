@@ -1,12 +1,14 @@
 package kiis.edu.rating.features.common;
 
 import kiis.edu.rating.exception.RecordNotFoundException;
+import kiis.edu.rating.exception.VersionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ public class SimpleCurdService<T extends BaseEntity> implements SimpleCurd<T> {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('FILE_UPDATE')")
     public Page<T> findAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
@@ -43,12 +46,17 @@ public class SimpleCurdService<T extends BaseEntity> implements SimpleCurd<T> {
     @Override
     public T update(T entity, long id) {
         final T old = findById(id);
+        if (old.version != entity.version) {
+            throw new VersionException();
+        }
         BeanUtils.copyProperties(entity, old);
         return repository.save(old);
     }
 
     @Override
-    public void delete(long id) {
-        repository.delete(findById(id));
+    public T delete(long id) {
+        final T entity = findById(id);
+        entity.disable = false;
+        return repository.save(entity);
     }
 }

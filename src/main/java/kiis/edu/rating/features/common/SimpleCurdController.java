@@ -48,7 +48,7 @@ public class SimpleCurdController<T extends BaseEntity> implements SimpleCurd<T>
 
     @Override
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id) {
-        service.delete(id);
+    public T delete(@PathVariable long id) {
+        return service.delete(id);
     }
 }

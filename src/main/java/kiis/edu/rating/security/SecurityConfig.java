@@ -39,31 +39,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public Filter corsFilter() {
-        return new Filter() {
-            @Override
-            public void init(FilterConfig filterConfig) throws ServletException {
-            }
+        return (servletRequest, servletResponse, filterChain) -> {
 
-            @Override
-            public void destroy() {
-            }
+            final HttpServletRequest request = (HttpServletRequest) servletRequest;
+            final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-            @Override
-            public void doFilter(ServletRequest servletRequest,
-                                 ServletResponse servletResponse,
-                                 FilterChain filterChain)
-                    throws IOException, ServletException {
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Headers", "Authorization, *");
+            response.setHeader("Access-Control-Allow-Methods", "*");
 
-                HttpServletRequest request = (HttpServletRequest) servletRequest;
-                HttpServletResponse response = (HttpServletResponse) servletResponse;
-
-                response.setHeader("Access-Control-Allow-Origin", "*");
-                response.setHeader("Access-Control-Allow-Headers", "Authorization, *");
-                response.setHeader("Access-Control-Allow-Methods", "*");
-
-                filterChain.doFilter(servletRequest, servletResponse);
-            }
-
+            filterChain.doFilter(request, response);
         };
     }
 

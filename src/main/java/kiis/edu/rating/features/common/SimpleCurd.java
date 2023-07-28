@@ -20,5 +20,5 @@ public interface SimpleCurd<T extends BaseEntity> {
 
     T update(T entity, long id);
 
-    void delete(long id);
+    T delete(long id);
 }

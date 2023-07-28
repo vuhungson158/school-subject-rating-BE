@@ -23,28 +23,28 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader(TOKEN_HEADER);
+        final String authorizationHeader = request.getHeader(TOKEN_HEADER);
         if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            String token = authorizationHeader.replace(BEARER, "");
-            Claims claimsJwsBody = Jwts.parserBuilder()
+            final String token = authorizationHeader.replace(BEARER, "");
+            final Claims claimsJwsBody = Jwts.parserBuilder()
                     .setSigningKey(ENCODED_SECRET_KEY)
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            String username = claimsJwsBody.getSubject();
-            UserRole role = UserRole.valueOf((String) claimsJwsBody.get(CLAIM_AUTHORITY));
-            Set<SimpleGrantedAuthority> simpleGrantedAuthorities = role.getGrantedAuthorities();
+            final String username = claimsJwsBody.getSubject();
+            final UserRole role = UserRole.valueOf((String) claimsJwsBody.get(CLAIM_AUTHORITY));
+            final Set<SimpleGrantedAuthority> simpleGrantedAuthorities = role.getGrantedAuthorities();
 
-            Authentication authentication =
+            final Authentication authentication =
                     new UsernamePasswordAuthenticationToken(username, null, simpleGrantedAuthorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        } catch (JwtException e) {
+        } catch (final JwtException e) {
             LOGGER.error("Token cannot be trust");
         }
 

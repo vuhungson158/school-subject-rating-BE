@@ -23,4 +23,6 @@ public abstract class BaseEntity {
     @Column(insertable = false, updatable = false)
     public Instant updatedAt;
     public boolean disable = false;
+    @Version
+    public int version;
 }
