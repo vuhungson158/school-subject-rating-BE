@@ -1,8 +1,11 @@
 package kiis.edu.rating.aop;
 
 
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.core.Authentication;
@@ -13,7 +16,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AOPHandler {
 
-    @Before(value = "@within(allowFeature) && @annotation(allowMethod)", argNames = "allowFeature,allowMethod")
+//    @Before(value = "@target(allowFeature) && @annotation(allowMethod)", argNames = "allowFeature,allowMethod")
+//    public void featureMethodInheritPointcut(AllowFeature allowFeature, AllowMethod allowMethod) {
+//        permissionCheck(allowFeature.value().concat(allowMethod.value()));
+//    }
+
+    @Before(value = "@target(allowFeature) && @annotation(allowMethod)", argNames = "allowFeature,allowMethod")
     public void featureMethodPointcut(AllowFeature allowFeature, AllowMethod allowMethod) {
         permissionCheck(allowFeature.value().concat(allowMethod.value()));
 

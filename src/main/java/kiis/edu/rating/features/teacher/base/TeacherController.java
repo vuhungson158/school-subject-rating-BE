@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static kiis.edu.rating.features.user.UserRole.Feature.TEACHER;
-import static kiis.edu.rating.features.user.UserRole.Method.GET_ALL;
+import static kiis.edu.rating.features.user.UserRole.Method.FIND_ALL;
 
 @SuppressWarnings({"unused", "ClassEscapesDefinedScope"})
 @RestController
@@ -32,11 +32,11 @@ public class TeacherController {
 
     @GetMapping("")
     public List<TeacherEntity> getAllEnable() {
-        return teacherRepository.findAllByDisable(false);
+        return teacherRepository.findAllByIsDeleted(false);
     }
 
     @GetMapping("/all")
-    @AllowMethod(GET_ALL)
+    @AllowMethod(FIND_ALL)
     public List<TeacherEntity> getAll() {
         return teacherRepository.findAll();
     }
@@ -60,7 +60,7 @@ public class TeacherController {
         TeacherEntity teacherEntity = teacherRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No Teacher with Id: " + id));
         subjectRepository.updateDisableSubjectByTeacherId(id, true);
-        teacherEntity.disable = true;
+        teacherEntity.isDeleted = true;
         teacherRepository.save(teacherEntity);
     }
 

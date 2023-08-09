@@ -28,7 +28,7 @@ public class SubjectCommentController {
 
     @GetMapping("")
     public List<SubjectCommentEntity> getAllEnable() {
-        return subjectCommentRepository.findAllByDisable(false);
+        return subjectCommentRepository.findAllByIsDeleted(false);
     }
 
     @GetMapping("/top-comment")

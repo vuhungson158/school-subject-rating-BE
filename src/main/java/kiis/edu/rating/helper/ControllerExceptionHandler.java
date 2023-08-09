@@ -24,15 +24,15 @@ public class ControllerExceptionHandler {
         }
         if (exception instanceof AccessDeniedException) {
             status = HttpStatus.FORBIDDEN;
-            message = "Your Role doesn't have permission to call this API";
+//            message = "Your Role doesn't have permission to call this API";
         }
         if (exception instanceof BadCredentialsException) {
             status = HttpStatus.UNAUTHORIZED;
         }
         if (exception instanceof MethodArgumentNotValidException) {
-            List<FieldError> allErrors = ((MethodArgumentNotValidException) exception).getBindingResult().getFieldErrors();
-            StringBuilder sb = new StringBuilder();
-            for (FieldError error : allErrors) {
+            final List<FieldError> allErrors = ((MethodArgumentNotValidException) exception).getBindingResult().getFieldErrors();
+            final StringBuilder sb = new StringBuilder();
+            for (final FieldError error : allErrors) {
                 sb.append("Field: [").append(error.getField()).append("] ")
                         .append(error.getDefaultMessage())
                         .append(", rejected value: ").append(error.getRejectedValue()).append(". ");

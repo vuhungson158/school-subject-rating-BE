@@ -1,6 +1,6 @@
 package kiis.edu.rating.features.subject.condition;
 
-import kiis.edu.rating.features.common.BaseEntity;
+import kiis.edu.rating.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 

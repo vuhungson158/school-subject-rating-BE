@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface SubjectPlanRepository extends JpaRepository<SubjectPlanEntity, Long> {
 
-    List<SubjectConditionEntity> findAllByDisable(boolean disable);
+    List<SubjectConditionEntity> findAllByIsDeleted(boolean disable);
 
     boolean existsByUserId(long userId);
 }

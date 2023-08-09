@@ -1,7 +1,7 @@
 package kiis.edu.rating.features.subject.plan;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import kiis.edu.rating.features.common.BaseEntity;
+import kiis.edu.rating.common.BaseEntity;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 

@@ -35,7 +35,7 @@ public class TeacherCommentController {
 
     @GetMapping("")
     public List<TeacherCommentEntity> getAll() {
-        return teacherCommentRepository.findAllByDisable(false);
+        return teacherCommentRepository.findAllByIsDeleted(false);
     }
 
     @PostMapping("")

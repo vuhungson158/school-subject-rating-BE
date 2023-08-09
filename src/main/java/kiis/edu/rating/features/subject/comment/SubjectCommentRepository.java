@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface SubjectCommentRepository extends JpaRepository<SubjectCommentEntity, Long> {
-    List<SubjectCommentEntity> findAllByDisable(boolean disable);
+    List<SubjectCommentEntity> findAllByIsDeleted(boolean disable);
 
     boolean existsBySubjectIdAndUserId(long subjectId, long userId);
 }

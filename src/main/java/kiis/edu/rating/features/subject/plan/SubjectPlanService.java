@@ -29,8 +29,8 @@ public class SubjectPlanService {
     private List<SubjectConditionEntity> conditionList;
 
     public List<BigGroup> createList() {
-        this.subjectList = subjectRepository.findAllByDisable(false);
-        this.conditionList = subjectConditionRepository.findAllByDisable(false);
+        this.subjectList = subjectRepository.findAllByIsDeletedFalse();
+        this.conditionList = subjectConditionRepository.findAllByIsDeleted(false);
 
         return bigList();
     }

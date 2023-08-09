@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/ratting
     username: postgres
     password:
 #    url: jdbc:postgresql://arjuna.db.elephantsql.com:5432/qyulntal
@@ -13,7 +13,7 @@ spring:
       hibernate:
         format_sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     open-in-view: true
 
   devtools:

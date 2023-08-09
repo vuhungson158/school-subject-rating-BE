@@ -12,7 +12,7 @@ import java.util.List;
 @Transactional
 @Repository
 public interface SubjectRepository extends JpaRepository<SubjectEntity, Long> {
-    List<SubjectEntity> findAllByDisable(boolean disable);
+    List<SubjectEntity> findAllByIsDeletedFalse();
 
     @Modifying
     @Query(value = "UPDATE subject SET disable = :disable WHERE teacher_id = :teacherId", nativeQuery = true)

@@ -3,7 +3,7 @@ package kiis.edu.rating.features.user;
 import io.jsonwebtoken.Jwts;
 import kiis.edu.rating.enums.Gender;
 import kiis.edu.rating.exception.LoginException;
-import kiis.edu.rating.features.common.BaseEntity;
+import kiis.edu.rating.common.BaseEntity;
 import kiis.edu.rating.helper.Util;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -82,7 +82,7 @@ public class UserController {
         if (!optionalUser.isPresent())
             throw new IllegalArgumentException("No User with Id: " + id);
         UserEntity userEntity = optionalUser.get();
-        userEntity.disable = true;
+        userEntity.isDeleted = true;
         userRepository.save(userEntity);
         return true;
     }

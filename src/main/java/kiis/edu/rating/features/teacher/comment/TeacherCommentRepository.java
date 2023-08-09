@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface TeacherCommentRepository extends JpaRepository<TeacherCommentEntity, Long> {
-    List<TeacherCommentEntity> findAllByDisable(boolean disable);
+    List<TeacherCommentEntity> findAllByIsDeleted(boolean disable);
 
     boolean existsByTeacherIdAndUserId(long teacherId, long userId);
 }

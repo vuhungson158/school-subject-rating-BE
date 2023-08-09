@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface SubjectConditionRepository extends JpaRepository<SubjectConditionEntity, Long> {
 
-    List<SubjectConditionEntity> findAllByDisable(boolean disable);
+    List<SubjectConditionEntity> findAllByIsDeleted(boolean disable);
 }
 
 

@@ -31,11 +31,11 @@ public class SubjectControllerV2 {
 
     @GetMapping("")
     public List<SubjectEntity> getAllEnable() {
-        return subjectRepository.findAllByDisable(false);
+        return subjectRepository.findAllByIsDeletedFalse();
     }
 
     @GetMapping("/all")
-    @AllowMethod(GET_ALL)
+    @AllowMethod(FIND_ALL)
     public List<SubjectEntity> getAll() {
         return subjectRepository.findAll();
     }
@@ -66,7 +66,7 @@ public class SubjectControllerV2 {
 
         final SubjectEntity subjectEntity = subjectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No subject with id : " + id));
-        subjectEntity.disable = true;
+        subjectEntity.isDeleted = true;
         subjectRepository.save(subjectEntity);
     }
 

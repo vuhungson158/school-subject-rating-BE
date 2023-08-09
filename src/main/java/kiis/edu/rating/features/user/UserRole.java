@@ -9,8 +9,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static kiis.edu.rating.features.user.UserRole.Feature.*;
-import static kiis.edu.rating.features.user.UserRole.Method.*;
+import static kiis.edu.rating.features.user.UserRole.Feature.SUBJECT;
+import static kiis.edu.rating.features.user.UserRole.Feature.SUBJECT_COMMENT;
+import static kiis.edu.rating.features.user.UserRole.Feature.SUBJECT_RATING;
+import static kiis.edu.rating.features.user.UserRole.Feature.TEACHER;
+import static kiis.edu.rating.features.user.UserRole.Feature.TEACHER_COMMENT;
+import static kiis.edu.rating.features.user.UserRole.Method.CREATE;
+import static kiis.edu.rating.features.user.UserRole.Method.DELETE;
+import static kiis.edu.rating.features.user.UserRole.Method.FIND_ALL;
+import static kiis.edu.rating.features.user.UserRole.Method.UPDATE;
 
 @Getter
 public enum UserRole {
@@ -21,7 +28,7 @@ public enum UserRole {
             SUBJECT_COMMENT.all()
     ),
     USER(
-            TEACHER.methods(GET_ALL, CREATE),
+            TEACHER.methods(FIND_ALL, CREATE),
             TEACHER_COMMENT.methods(UPDATE, DELETE)
     );
 
@@ -29,7 +36,7 @@ public enum UserRole {
 
     @SafeVarargs
     UserRole(Set<Combinator>... sets) {
-        Set<String> userAuthorities = new HashSet<>();
+        final Set<String> userAuthorities = new HashSet<>();
         Arrays.stream(sets).forEach(combinators -> userAuthorities.addAll(
                 combinators.stream()
                         .map(Combinator::concat)
@@ -39,7 +46,7 @@ public enum UserRole {
     }
 
     public Set<SimpleGrantedAuthority> getGrantedAuthorities() {
-        Set<SimpleGrantedAuthority> permissions = this.authorities.stream()
+        final Set<SimpleGrantedAuthority> permissions = this.authorities.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
         permissions.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
@@ -47,13 +54,7 @@ public enum UserRole {
     }
 
     public enum Method {
-        GET_ALL("all"), GET_ENABLED(""), GET_BY_ID(""), CREATE(""), UPDATE(""), DELETE(""), SWITCH_DISABLED("");
-
-        public final String value;
-
-        Method(String value) {
-            this.value = value;
-        }
+        FIND_ALL, FIND_ENABLED, FIND_BY_ID, FIND_BY_PAGEABLE, FIND_BY_FILTER, CREATE, UPDATE, DELETE, FORCE_DELETE;
     }
 
     public enum Feature {
@@ -77,22 +78,23 @@ public enum UserRole {
 
         public Set<Combinator> all() {
             return methods(Method.values());
-        } 
+        }
 
         public static Set<Combinator> altogether() {
-            Set<Combinator> result = new HashSet<>();
+            final Set<Combinator> result = new HashSet<>();
             Arrays.stream(Feature.values()).forEach(feature -> result.addAll(feature.all()));
             return result;
         }
     }
 
-    @AllArgsConstructor
-    private static class Combinator {
-        private final Feature feature;
-        private final Method method;
+}
 
-        public String concat() {
-            return feature.name() + "__" + method.name();
-        }
+@AllArgsConstructor
+class Combinator {
+    private final UserRole.Feature feature;
+    private final UserRole.Method method;
+
+    public String concat() {
+        return feature.name() + "__" + method.name();
     }
 }
