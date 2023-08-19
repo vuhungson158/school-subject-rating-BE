@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-public abstract class SimpleCurdService<T extends BaseEntity> implements SimpleCurd<T> {
+public abstract class SimpleCurdService<T extends BaseEntity>
+        implements SimpleCurd<T> {
+
     private final JpaRepository<T, Long> mainRepository;
 
     @Override

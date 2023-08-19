@@ -44,8 +44,8 @@ public class SubjectControllerV2 {
     @AllowMethod(CREATE)
     public void create(@RequestBody @Valid SubjectRequest request) {
 
-        if (!teacherRepository.existsById(request.teacherId))
-            throw new IllegalArgumentException("No teacher with id : " + request.teacherId);
+//        if (!teacherRepository.existsById(request.teacherId))
+//            throw new IllegalArgumentException("No teacher with id : " + request.teacherId);
         subjectRepository.save(request.toEntity());
     }
 

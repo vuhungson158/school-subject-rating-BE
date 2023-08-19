@@ -1,6 +1,5 @@
 package kiis.edu.rating.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;

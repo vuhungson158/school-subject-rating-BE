@@ -7,15 +7,22 @@ import kiis.edu.rating.features.subject.condition.SubjectConditionEntity;
 import kiis.edu.rating.features.subject.condition.SubjectConditionRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static kiis.edu.rating.enums.Department.ALL;
-import static kiis.edu.rating.enums.SubjectClassification.*;
+import static kiis.edu.rating.enums.SubjectClassification.Big;
+import static kiis.edu.rating.enums.SubjectClassification.Middle;
+import static kiis.edu.rating.enums.SubjectClassification.Small;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +43,9 @@ public class SubjectPlanService {
     }
 
 
-    private List<BigGroup> bigList() {
+    private @NotNull List<BigGroup> bigList() {
         final List<BigGroup> bigGroupList = new ArrayList<>();
-        for (Big big : Big.values()) {
+        for (final Big big : Big.values()) {
             currentBig = big;
 
             final List<SubjectEntity> filteredByBig = filter(subjectList,
@@ -52,7 +59,7 @@ public class SubjectPlanService {
 
     private List<MiddleGroup> middleList(List<SubjectEntity> filteredByBig) {
         final List<MiddleGroup> middleGroupList = new ArrayList<>();
-        for (Middle middle : Middle.values()) {
+        for (final Middle middle : Middle.values()) {
             currentMiddle = middle;
 
             if (!middle.getBig().equals(currentBig)) continue;
@@ -68,7 +75,7 @@ public class SubjectPlanService {
     private List<SmallGroup> smallList(List<SubjectEntity> filteredByMiddle) {
         final List<SmallGroup> smallGroupList = new ArrayList<>();
 
-        for (Small small : Small.values()) {
+        for (final Small small : Small.values()) {
             if (!small.getMiddle().equals(currentMiddle)) continue;
             final List<SubjectEntity> filteredBySmall = filter(
                     filteredByMiddle, subject -> subject.classification.equals(small)
@@ -101,7 +108,7 @@ class BigGroup extends Group<Big> {
     }
 
     private void add(Department department, int row) {
-        Integer pre = this.rowspan.get(department);
+        final Integer pre = this.rowspan.get(department);
         this.rowspan.put(department, pre + row);
     }
 }
@@ -131,12 +138,12 @@ class MiddleGroup extends Group<Middle> {
     }
 
     private void increase(Department department) {
-        Integer pre = this.rowspan.get(department);
+        final Integer pre = this.rowspan.get(department);
         this.rowspan.put(department, pre + 1);
     }
 
     private int countRequiredCredits() {
-        AtomicInteger total = new AtomicInteger();
+        final AtomicInteger total = new AtomicInteger();
         this.smallList.forEach(small -> small.yearList.forEach(year -> year.forEach(subject -> {
             if (subject.subjectEntity.require) total.addAndGet(subject.subjectEntity.credit);
         })));
@@ -158,7 +165,7 @@ class SmallGroup extends Group<Small> {
         this.conditionList = conditionList;
         this.subjectList = subjectEntityList;
 
-        List<List<SubjectWithCondition>> yearList = new ArrayList<>();
+        final List<List<SubjectWithCondition>> yearList = new ArrayList<>();
         for (int i = 1; i <= 2; i++) {
             yearList.add(filterByYear(Collections.singletonList(i)));
         }
@@ -180,11 +187,12 @@ class Group<N> {
     public final String label;
 }
 
-class SubjectWithCondition {
-    final public SubjectEntity subjectEntity;
-    final public List<Long> conditionList;
 
-    public SubjectWithCondition(SubjectEntity subjectEntity, List<SubjectConditionEntity> conditionList) {
+class SubjectWithCondition {
+    public final SubjectEntity subjectEntity;
+    public final List<Long> conditionList;
+
+    public SubjectWithCondition(SubjectEntity subjectEntity, @NotNull List<SubjectConditionEntity> conditionList) {
         this.subjectEntity = subjectEntity;
         this.conditionList = conditionList.stream()
                 .filter(condition -> condition.toId == subjectEntity.id)

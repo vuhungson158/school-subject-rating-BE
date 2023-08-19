@@ -6,7 +6,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public abstract class AdvanceService<T extends BaseEntity> extends SimpleCurdService<T> implements AdvanceBusiness<T> {
+public abstract class AdvanceService<T extends BaseEntity>
+        extends SimpleCurdService<T>
+        implements AdvanceBusiness<T> {
 
     final JpaRepository<T, Long> mainRepository;
 

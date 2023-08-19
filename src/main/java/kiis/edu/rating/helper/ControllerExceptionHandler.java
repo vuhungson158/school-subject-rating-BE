@@ -1,6 +1,7 @@
 package kiis.edu.rating.helper;
 
 import kiis.edu.rating.features.common.BaseResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,6 +29,9 @@ public class ControllerExceptionHandler {
         }
         if (exception instanceof BadCredentialsException) {
             status = HttpStatus.UNAUTHORIZED;
+        }
+        if (exception instanceof DataIntegrityViolationException) {
+            status = HttpStatus.BAD_REQUEST;
         }
         if (exception instanceof MethodArgumentNotValidException) {
             final List<FieldError> allErrors = ((MethodArgumentNotValidException) exception).getBindingResult().getFieldErrors();
